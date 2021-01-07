@@ -1,6 +1,5 @@
-# Python program to read
-# json file
-
+#for print style
+#import os
 
 import json
 
@@ -31,9 +30,29 @@ def extract_values(obj, key):
     results = extract(obj, arr, key)
     return results
 
+def extract_durations(obj):
+    arr = []
+    days = 0
+    for item in obj:
+        beg_duration = item.find("<duration>")
+        end_duration= item.find("</duration>")
+        if (beg_duration!=-1 & end_duration !=-1):
+            duration = float(item[beg_duration+10:end_duration])
+            days += duration
+            arr.append(duration)
+    return arr, days/60/60/24
+
+"""extract message content into array"""
 #begin recursion
 message_content=extract_values(data, "content")
-print(message_content)
 
+"""extract call durations"""
+durations, days = extract_durations(message_content)
+print(durations)
+print("Number of calls: ",len(durations))
+print("Total skype-time in days: ",days)
+print("That is " + str(round(days*24,2)) + " hours!")
+print("     or " + str(round(days*24*60)) + " days!")
+print("        " + str(round(days*24*60*60)) + " seconds!")
 # Closing file
 f.close()
