@@ -58,19 +58,18 @@ def extract_call_date(obj, calls):
             year  = int(j[0][0:4])
             month = int(j[0][5:7])
             day   = int(j[0][8:10])
-            calls[0].append(datetime.date(year, month, day))
             
             j = extract_values(item, "content")
             beg_duration = j[0].find("<duration>")
             end_duration = j[0].find("</duration>")
             if (beg_duration != -1 & end_duration != -1):
                 duration = float(j[0][beg_duration+10:end_duration])/60/60
-            if datetime.date(year, month, day) in calls[1]:
-                buffer = calls[1][datetime.date(year, month, day)]
-                del calls[1][datetime.date(year, month, day)]
-                calls[1][datetime.date(year, month, day)]=buffer+duration
+            if datetime.date(year, month, day) in calls:
+                buffer = calls[datetime.date(year, month, day)]
+                del calls[datetime.date(year, month, day)]
+                calls[datetime.date(year, month, day)]=buffer+duration
             else:
-                calls[1][datetime.date(year, month, day)] = duration
+                calls[datetime.date(year, month, day)] = duration
 
 
 def is_call(obj):
@@ -79,8 +78,8 @@ def is_call(obj):
     return False
 
 def date_graph(calls):
-    dates = list(calls[1].keys())
-    durations = list(calls[1].values())
+    dates = list(calls.keys())
+    durations = list(calls.values())
     length = len(dates)-1
     
     a = pd.date_range(dates[length], dates[0])
@@ -94,7 +93,7 @@ def date_graph(calls):
         if index.date() in dates:
             all_days.at[index,'call']+=1
 
-    for d,t in calls[1].items():
+    for d,t in calls.items():
         dt=datetime.datetime.combine(d, datetime.datetime.min.time())
         all_days.at[dt,'duration']+=t
     fig_bin  = px.bar(all_days, x=all_days.index, y="call")
@@ -106,7 +105,7 @@ def date_graph(calls):
 
     print(all_days)
 
-    fig_lin = px.scatter(all_days, x=all_days.index, y="duration")
+    fig_lin = px.line(all_days, x=all_days.index, y="duration")
 
     fig_bin.show()
     fig_lin.show()
@@ -140,9 +139,7 @@ def get_duration():
 
 
 #initialize files
-dates =[]
-time =dict([])
-calls=[dates,time]
+calls=dict([])
 
 #extract MessageList as array
 #message_content[0] is most recent message
