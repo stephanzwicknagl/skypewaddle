@@ -52,7 +52,7 @@ print(durations)
 print("Number of calls: ",len(durations))
 print("Total skype-time in days: ",days)
 print("That is " + str(round(days*24,2)) + " hours!")
-print("     or " + str(round(days*24*60)) + " days!")
+print("     or " + str(round(days*24*60)) + " minutes!")
 print("        " + str(round(days*24*60*60)) + " seconds!")
 # Closing file
 f.close()
