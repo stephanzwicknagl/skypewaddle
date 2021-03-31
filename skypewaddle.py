@@ -64,8 +64,13 @@ def extract_call_date(obj, calls):
             beg_duration = j[0].find("<duration>")
             end_duration = j[0].find("</duration>")
             if (beg_duration != -1 & end_duration != -1):
-                duration = float(j[0][beg_duration+10:end_duration])
-            calls[1][datetime.date(year,month,day)]=duration
+                duration = float(j[0][beg_duration+10:end_duration])/60/60
+            if datetime.date(year, month, day) in calls[1]:
+                buffer = calls[1][datetime.date(year, month, day)]
+                del calls[1][datetime.date(year, month, day)]
+                calls[1][datetime.date(year, month, day)]=buffer+duration
+            else:
+                calls[1][datetime.date(year, month, day)] = duration
 
 
 def is_call(obj):
@@ -74,7 +79,8 @@ def is_call(obj):
     return False
 
 def date_graph(calls):
-    dates = calls[0]
+    dates = list(calls[1].keys())
+    durations = list(calls[1].values())
     length = len(dates)-1
     
     a = pd.date_range(dates[length], dates[0])
@@ -87,16 +93,23 @@ def date_graph(calls):
     for index,row in all_days.iterrows():
         if index.date() in dates:
             all_days.at[index,'call']+=1
+
+    for d,t in calls[1].items():
+        dt=datetime.datetime.combine(d, datetime.datetime.min.time())
+        all_days.at[dt,'duration']+=t
     fig_bin  = px.bar(all_days, x=all_days.index, y="call")
     
-
-   
     """fig_heat = go.Figure(data=go.Heatmap(
         z = all_days[:,:,'duration'],
         x = all_days['date'] 
     ))"""
 
-    #fig_bin.show()
+    print(all_days)
+
+    fig_lin = px.scatter(all_days, x=all_days.index, y="duration")
+
+    fig_bin.show()
+    fig_lin.show()
     #fig_heat.show()
 
 
@@ -123,7 +136,6 @@ def get_duration():
     print("        " + str(round(days*24*60*60)) + " seconds!")
     # Closing file
 
-    
 
 
 
@@ -138,6 +150,5 @@ message_content = data['conversations'][0]['MessageList']
 
 
 extract_call_date(message_content, calls)
-print(calls[1])
 date_graph(calls)
 f.close()
