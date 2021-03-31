@@ -6,11 +6,13 @@ import datetime
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
+
 
 
 
 # Opening JSON file
-f = open('data/messages.json',"r",encoding='utf-8')
+f = open('data/31-03.json',"r",encoding='utf-8')
 
 # returns JSON object as
 # a dictionary
@@ -51,12 +53,20 @@ def extract_durations(obj):
 def extract_call_date(obj, calls):
 
     for item in obj:
+        duration=0
         if(is_call(item)):
             j = extract_values(item, 'originalarrivaltime')
             year  = int(j[0][0:4])
             month = int(j[0][5:7])
             day   = int(j[0][8:10])
             calls[0].append(datetime.date(year, month, day))
+            
+            j = extract_values(item, "content")
+            beg_duration = j[0].find("<duration>")
+            end_duration = j[0].find("</duration>")
+            if (beg_duration != -1 & end_duration != -1):
+                duration = float(j[0][beg_duration+10:end_duration])
+            calls[1].append(duration)
 
 
 def is_call(obj):
@@ -64,21 +74,34 @@ def is_call(obj):
         return True
     return False
 
-def date_graph(dates):
+def date_graph(calls):
+    dates = calls[0]
     length = len(dates)-1
     
     a = pd.date_range(dates[length], dates[0])
     all_days = pd.DataFrame({
         'date': a,
-        'call': np.zeros(a.shape[0])
-    }, columns=['date', 'call']).set_index("date")
+        'call': np.zeros(a.shape[0]),
+        'duration' : np.zeros(a.shape[0])
+    }, columns=['date', 'call', 'duration']).set_index("date")
     
     for index,row in all_days.iterrows():
         if index.date() in dates:
             all_days.at[index,'call']+=1
+    fig_bin  = px.bar(all_days, x=all_days.index, y="call")
+    #for day in dates:
+
+    print(calls)
     print(all_days)
-    fig = px.bar(all_days, x=all_days.index, y="call")
-    fig.show()
+    """fig_heat = go.Figure(data=go.Heatmap(
+        z = all_days[:,:,'duration'],
+        x = all_days['date'] 
+    ))"""
+
+    #fig_bin.show()
+    #fig_heat.show()
+
+
 
 
 
@@ -87,27 +110,29 @@ def date_graph(dates):
         
 
 
+def get_duration():
+    """extract message content into array"""
+    #begin recursion
+    message_content=extract_values(data, "content")
 
-"""extract message content into array"""
-#begin recursion
-message_content=extract_values(data, "content")
+    """extract call durations"""
+    durations, days = extract_durations(message_content)
+    #print(durations)
+    print("Number of calls: ",len(durations))
+    print("Total skype-time in days: ",days)
+    print("That is " + str(round(days*24,2)) + " hours!")
+    print("     or " + str(round(days*24*60)) + " minutes!")
+    print("        " + str(round(days*24*60*60)) + " seconds!")
+    # Closing file
 
-"""extract call durations"""
-durations, days = extract_durations(message_content)
-#print(durations)
-print("Number of calls: ",len(durations))
-print("Total skype-time in days: ",days)
-print("That is " + str(round(days*24,2)) + " hours!")
-print("     or " + str(round(days*24*60)) + " minutes!")
-print("        " + str(round(days*24*60*60)) + " seconds!")
-# Closing file
+    
+
+
 
 #initialize files
 dates =[]
 time =[]
 calls=[dates,time]
-
-
 
 #extract MessageList as array
 #message_content[0] is most recent message
@@ -115,5 +140,5 @@ message_content = data['conversations'][0]['MessageList']
 
 
 extract_call_date(message_content, calls)
-date_graph(calls[0])
+date_graph(calls)
 f.close()
