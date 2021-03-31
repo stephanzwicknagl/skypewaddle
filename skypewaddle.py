@@ -3,6 +3,10 @@
 
 import json
 import datetime
+import numpy as np
+import pandas as pd
+import plotly.express as px
+
 
 
 # Opening JSON file
@@ -61,8 +65,28 @@ def is_call(obj):
     return False
 
 def date_graph(dates):
+    length = len(dates)-1
     
+    a = pd.date_range(dates[length], dates[0])
+    all_days = pd.DataFrame({
+        'date': a,
+        'call': np.zeros(a.shape[0])
+    }, columns=['date', 'call']).set_index("date")
+    
+    for index,row in all_days.iterrows():
+        if index.date() in dates:
+            all_days.at[index,'call']+=1
+    print(all_days)
+    fig = px.bar(all_days, x=all_days.index, y="call")
+    fig.show()
+
+
+
+     
+
         
+
+
 
 """extract message content into array"""
 #begin recursion
@@ -91,5 +115,5 @@ message_content = data['conversations'][0]['MessageList']
 
 
 extract_call_date(message_content, calls)
-
+date_graph(calls[0])
 f.close()
