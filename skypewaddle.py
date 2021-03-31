@@ -51,7 +51,6 @@ def extract_durations(obj):
     return arr, days/60/60/24
 
 def extract_call_date(obj, calls):
-
     for item in obj:
         duration=0
         if(is_call(item)):
@@ -66,7 +65,7 @@ def extract_call_date(obj, calls):
             end_duration = j[0].find("</duration>")
             if (beg_duration != -1 & end_duration != -1):
                 duration = float(j[0][beg_duration+10:end_duration])
-            calls[1].append(duration)
+            calls[1][datetime.date(year,month,day)]=duration
 
 
 def is_call(obj):
@@ -89,10 +88,9 @@ def date_graph(calls):
         if index.date() in dates:
             all_days.at[index,'call']+=1
     fig_bin  = px.bar(all_days, x=all_days.index, y="call")
-    #for day in dates:
+    
 
-    print(calls)
-    print(all_days)
+   
     """fig_heat = go.Figure(data=go.Heatmap(
         z = all_days[:,:,'duration'],
         x = all_days['date'] 
@@ -131,7 +129,7 @@ def get_duration():
 
 #initialize files
 dates =[]
-time =[]
+time =dict([])
 calls=[dates,time]
 
 #extract MessageList as array
@@ -140,5 +138,6 @@ message_content = data['conversations'][0]['MessageList']
 
 
 extract_call_date(message_content, calls)
+print(calls[1])
 date_graph(calls)
 f.close()
