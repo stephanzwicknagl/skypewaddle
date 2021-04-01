@@ -121,22 +121,23 @@ def date_graph(calls):
 
 def week_avg(df):
     week = pd.DataFrame({
-        'day': np.arange(1,8),
+        'day': ["Sunday", "Saturday", "Friday", "Thursday", "Wednesday", "Tuesday", "Monday"],
         'dings': np.zeros(7),
         'duration': np.zeros(7),
         'avg': np.zeros(7)
     }, columns=['day', 'dings', 'duration', 'avg']).set_index("day")
     for ind,row in df.iterrows():
-        week.loc[ind.isoweekday(), 'duration'] += row.loc['duration']
-        week.loc[ind.isoweekday(), 'dings'] += 1
+        week.loc[ind.strftime("%A"), 'duration'] += row.loc['duration']
+        week.loc[ind.strftime("%A"), 'dings'] += 1
     week.loc[:,'avg']=week.loc[:,'duration']/week.loc[:,'dings']
 
-    weekdays_aux = ["Sunday", "Saturday", "Friday", "Thursday", "Wednesday", "Tuesday", "Monday"]
+    weekdays_aux = ["Sunday", "Saturday", "Friday",
+                    "Thursday", "Wednesday", "Tuesday", "Monday"]
     fig_bar=go.Figure()
     
     fig_bar.add_trace(go.Bar(   
-                y=weekdays_aux,
-                x=week.iloc[::-1,2],
+                y=week.index,
+                x=week.loc[:,'avg'],
                 orientation='h'
     ))
     fig_bar.update_layout(
@@ -144,9 +145,25 @@ def week_avg(df):
         plot_bgcolor='rgb(248, 248, 255)',
         margin=dict(l=120, r=10, t=140, b=80)
     )
+    fig_bar.update_xaxes(
+        title_text="average hours skyped",
+        title_font={"size": 14}  
+    )
+    fig_bar.add_annotation(
+                dict(font=dict(color='black',size=20, family='Arial'),
+                x=0,
+                y=-0.12,
+                showarrow=False,
+                text="Your favorite skype-day is "+week.loc[:,'avg'].idxmax(),
+                textangle=0,
+                xanchor='left',
+                xref='paper',
+                yref='paper')
+    )
     fig_bar.show()
 
-    print(week.max())
+
+    print(week.loc[:,'avg'].idxmax())
 
 
 
