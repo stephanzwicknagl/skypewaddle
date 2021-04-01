@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from scipy import signal
 
 
 
@@ -98,18 +99,56 @@ def date_graph(calls):
         all_days.at[dt,'duration']+=t
     fig_bin  = px.bar(all_days, x=all_days.index, y="call")
     
-    """fig_heat = go.Figure(data=go.Heatmap(
-        z = all_days[:,:,'duration'],
-        x = all_days['date'] 
-    ))"""
+    #fig_lin = px.line(all_days, x=all_days.index, y="duration")
+    fig_lin = go.Figure()
+    fig_lin.add_trace(go.Scatter(x=all_days.index, y=all_days['duration'],
+                             mode='markers',
+                             name='markers'))
 
-    print(all_days)
-
-    fig_lin = px.line(all_days, x=all_days.index, y="duration")
-
-    fig_bin.show()
+    fig_lin.add_trace(go.Scatter(x=all_days.index,
+                            y=signal.savgol_filter(all_days['duration'],
+                                                65,  # window size used for filtering
+                                                1),  # order of fitted polynomial
+                            mode='lines',
+                                 line=dict(color='rgba(165,165,0,0.4)', width=10 ),
+                            name='Savitzky-Golay'
+    ))
+    #fig_lin.update_yaxes(type="log")
+    #fig_bin.show()
     fig_lin.show()
     #fig_heat.show()
+    return all_days
+
+def week_avg(df):
+    week = pd.DataFrame({
+        'day': np.arange(1,8),
+        'dings': np.zeros(7),
+        'duration': np.zeros(7),
+        'avg': np.zeros(7)
+    }, columns=['day', 'dings', 'duration', 'avg']).set_index("day")
+    for ind,row in df.iterrows():
+        week.loc[ind.isoweekday(), 'duration'] += row.loc['duration']
+        week.loc[ind.isoweekday(), 'dings'] += 1
+    week.loc[:,'avg']=week.loc[:,'duration']/week.loc[:,'dings']
+
+    weekdays_aux = ["Sunday", "Saturday", "Friday", "Thursday", "Wednesday", "Tuesday", "Monday"]
+    fig_bar=go.Figure()
+    
+    fig_bar.add_trace(go.Bar(   
+                y=weekdays_aux,
+                x=week.iloc[::-1,2],
+                orientation='h'
+    ))
+    fig_bar.update_layout(
+        paper_bgcolor='rgb(248, 248, 255)',
+        plot_bgcolor='rgb(248, 248, 255)',
+        margin=dict(l=120, r=10, t=140, b=80)
+    )
+    fig_bar.show()
+
+    print(week.max())
+
+
 
 
 
@@ -147,5 +186,6 @@ message_content = data['conversations'][0]['MessageList']
 
 
 extract_call_date(message_content, calls)
-date_graph(calls)
+all_days=date_graph(calls)
+week_avg(all_days)
 f.close()
