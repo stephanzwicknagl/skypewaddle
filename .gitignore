@@ -1,6 +1,2 @@
-images/fig_bar.png
-images/fig_bin.png
-images/fig_lin.png
-data/31-03.json
-data/messages.json
-data/messageslang.json
+images/*
+data/*
