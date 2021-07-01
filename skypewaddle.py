@@ -1,5 +1,5 @@
 #for print style
-#import os
+import os
 
 import json
 import datetime
@@ -9,6 +9,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 from scipy import signal
 
+if not os.path.exists("images"):
+    os.mkdir("images")
 
 
 
@@ -53,24 +55,34 @@ def extract_durations(obj):
 
 def extract_call_date(obj, calls):
     for item in obj:
+        print(item)
+        call = []
         duration=0
         if(is_call(item)):
             j = extract_values(item, 'originalarrivaltime')
             year  = int(j[0][0:4])
             month = int(j[0][5:7])
             day   = int(j[0][8:10])
-            
+
             j = extract_values(item, "content")
+            # # find out if beginning or end (or missed)
+            # if j[0].find("started") != -1:
+            #     call[0] = datetime.date(year, month, day)
+
+            # if j[0].find("ended") != -1:
+            #     call[1] = datetime.date(year, month, day)
+
+            # get duration
             beg_duration = j[0].find("<duration>")
             end_duration = j[0].find("</duration>")
             if (beg_duration != -1 & end_duration != -1):
-                duration = float(j[0][beg_duration+10:end_duration])/60/60
+                call[2] = float(j[0][beg_duration+10:end_duration])/60/60
             if datetime.date(year, month, day) in calls:
-                buffer = calls[datetime.date(year, month, day)]
-                del calls[datetime.date(year, month, day)]
-                calls[datetime.date(year, month, day)]=buffer+duration
+                buffer = call[datetime.date(year, month, day)]
+                del call[datetime.date(year, month, day)]
+                call[datetime.date(year, month, day)]=buffer+duration
             else:
-                calls[datetime.date(year, month, day)] = duration
+                call[datetime.date(year, month, day)] = duration
 
 
 def is_call(obj):
@@ -115,7 +127,10 @@ def date_graph(calls):
     ))
     #fig_lin.update_yaxes(type="log")
     #fig_bin.show()
-    fig_lin.show()
+    #fig_lin.show()
+    fig_lin.write_image("images/fig_lin.png")
+    fig_bin.write_image("images/fig_bin.png")
+
     #fig_heat.show()
     return all_days
 
@@ -160,16 +175,24 @@ def week_avg(df):
                 xref='paper',
                 yref='paper')
     )
-    fig_bar.show()
+    #fig_bar.show()
+    fig_bar.write_image("images/fig_bar.png")
 
 
-    print(week.loc[:,'avg'].idxmax())
+def get_calls():
+    df = pd.DataFrame(columns=[
+        'Start Time', 
+        'End Time', 
+        'Duration', 
+        'Weekday'])
+
+    df = extract_call_date(data,df)
+    return df
 
 
 
-
-
-
+def draw():
+    pass
 
      
 
@@ -206,3 +229,12 @@ extract_call_date(message_content, calls)
 all_days=date_graph(calls)
 week_avg(all_days)
 f.close()
+
+
+
+def main():
+    # get dataframe of skype calls
+    df = get_calls()
+
+    # generate images
+    draw(df)
