@@ -32,6 +32,7 @@ def get_calls(path):
         'Start Time',
         'End Time',
         'Duration',
+        'Duration Skype'
         'Weekday'])
     df.set_index('Call ID', inplace=True)
 
@@ -49,6 +50,8 @@ def get_calls(path):
         if calls is None:
             continue 
         df = df.combine_first(calls)
+    
+    df = calculate_durations(df)
     
     return df
             
@@ -75,7 +78,12 @@ def get_times(obj):
     if start_end == 'started':
         calls = pd.DataFrame(data={'Call ID': id,'Start Time': time, 'End Time': np.nan}, index=[id])
     elif start_end == 'ended':
-        calls = pd.DataFrame(data={'Call ID': id,'Start Time': np.nan, 'End Time': time}, index=[id])
+        duration = re.findall('<duration>([0-9.]+)</duration>', content)
+        if len(duration) != 0:
+            duration=float(duration[0])
+        else:
+            duration=0
+        calls = pd.DataFrame(data={'Call ID': id,'Start Time': np.nan, 'End Time': time, 'Duration Skype': duration}, index=[id])
     else:
         return
     calls.set_index('Call ID', inplace=True)
@@ -118,6 +126,15 @@ def get_call_time(obj):
     second  =     int(time[17:19])
 
     return datetime.datetime(year, month, day, hour, minute, second)
+
+def calculate_durations(df):
+    """ takes filled dataframe df 
+    returns dataframe df filled with duration
+    calculates call duration from skype times """
+    for index, row in df.iterrows():
+        duration = row['End Time'] - row['Start Time']
+        df.loc[index, 'Duration'] = float(duration.seconds)
+    return df
 
 def main():
     """ calls get_calls to
