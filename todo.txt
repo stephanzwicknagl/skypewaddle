@@ -1,7 +1,3 @@
-Heatmap
+Heatmap graph
 
-reorganize array calls[dates, calls]
-
-wer ruft wen an
-
-wer hängt auf?
+Caller-Terminator graph (bar chart)
