@@ -57,7 +57,7 @@ def get_calls(path, my_timezone):
         df = df.combine_first(calls)
 
     df = fix_old_ids(df)
-
+    df = assign_date_for_midnight(df, my_timezone)
     return df
             
 
@@ -92,14 +92,14 @@ def get_times(obj, my_timezone):
 
     start_end = re.findall('type=\\"(\S+)\\"', content)[0]
     if start_end == 'started':
-        calls = pd.DataFrame(data={'Call ID': call_id, 'ID': id_sec, 'Start Time': time, 'End Time': np.nan, 'Caller': val_from}, index=[id])
+        calls = pd.DataFrame(data={'Call ID': call_id, 'ID': id_sec, 'Start Time': time, 'End Time': np.nan, 'Caller': val_from}, index=['Call ID'])
     elif start_end == 'ended':
         duration = re.findall('<duration>([0-9.]+)</duration>', content)
         if len(duration) != 0:
             duration=float(duration[0])
         else:
             duration=0
-        calls = pd.DataFrame(data={'Call ID': call_id, 'ID': id_sec, 'Start Time': np.nan, 'End Time': time, 'Duration': duration, 'Terminator': val_from}, index=[id])
+        calls = pd.DataFrame(data={'Call ID': call_id, 'ID': id_sec, 'Start Time': np.nan, 'End Time': time, 'Duration': duration, 'Terminator': val_from}, index=['Call ID'])
     else:
         return
     calls.set_index('Call ID', inplace=True)
@@ -171,6 +171,44 @@ def fix_old_ids(df):
             df.loc[df['ID'] == index, 'Duration'] = df.loc[index, 'Duration']
             df.loc[df['ID'] == index, 'Terminator'] = df.loc[index, 'Terminator']
             df.drop(index, inplace=True)
+
+    return df
+
+def assign_date_for_midnight(df, my_timezone):
+    for index, row in df.iterrows():
+        if row['Start Time'].date() != row['End Time'].date():
+            call_id_new = index + '_2'
+            date_new = row['End Time'].date()
+            start_time_new = datetime.datetime(year=date_new.year, month=date_new.month, 
+                                            day=date_new.day, hour=0,minute=0,second=0,
+                                            tzinfo=pytz.timezone(my_timezone))
+            end_time_new = row['End Time']
+            duration_new = float((end_time_new - start_time_new).seconds)
+            terminator_new = row['Terminator']
+
+            call_id_pre = index + '_1'
+            start_time_pre = row['Start Time']
+            date_pre = row['Start Time'].date()
+            end_time_pre = datetime.datetime(year=date_pre.year, month=date_pre.month,
+                                             day=date_pre.day, hour=23, minute=59, second=59, 
+                                             tzinfo=pytz.timezone(my_timezone))
+            duration_pre = row['Duration'] - duration_new
+            caller_pre = row['Caller']
+
+            call = pd.DataFrame(data={
+                                'Call ID': [call_id_pre, call_id_new],
+                                'Start Time': [start_time_pre, start_time_new],
+                                'End Time': [end_time_pre, end_time_new],
+                                'Caller': [caller_pre, np.nan],
+                                'Terminator': [np.nan, terminator_new],
+                                'Duration': [duration_pre, duration_new],
+                                },
+                                index=[call_id_pre, call_id_new]
+                                )
+            call.set_index('Call ID', inplace=True)
+
+            df.drop(df.loc[df.index ==index].index, inplace=True)
+            df = df.append(call, ignore_index=True)
 
     return df
 
