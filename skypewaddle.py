@@ -94,14 +94,14 @@ def date_graph(calls):
     dates = list(calls.keys())
     durations = list(calls.values())
     length = len(dates)-1
-    
+
     a = pd.date_range(dates[length], dates[0])
     all_days = pd.DataFrame({
         'date': a,
         'call': np.zeros(a.shape[0]),
         'duration' : np.zeros(a.shape[0])
     }, columns=['date', 'call', 'duration']).set_index("date")
-    
+
     for index,row in all_days.iterrows():
         if index.date() in dates:
             all_days.at[index,'call']+=1
@@ -110,7 +110,7 @@ def date_graph(calls):
         dt=datetime.datetime.combine(d, datetime.datetime.min.time())
         all_days.at[dt,'duration']+=t
     fig_bin  = px.bar(all_days, x=all_days.index, y="call")
-    
+
     #fig_lin = px.line(all_days, x=all_days.index, y="duration")
     fig_lin = go.Figure()
     fig_lin.add_trace(go.Scatter(x=all_days.index, y=all_days['duration'],
@@ -149,8 +149,8 @@ def week_avg(df):
     weekdays_aux = ["Sunday", "Saturday", "Friday",
                     "Thursday", "Wednesday", "Tuesday", "Monday"]
     fig_bar=go.Figure()
-    
-    fig_bar.add_trace(go.Bar(   
+
+    fig_bar.add_trace(go.Bar(
                 y=week.index,
                 x=week.loc[:,'avg'],
                 orientation='h'
@@ -162,7 +162,7 @@ def week_avg(df):
     )
     fig_bar.update_xaxes(
         title_text="average hours skyped",
-        title_font={"size": 14}  
+        title_font={"size": 14}
     )
     fig_bar.add_annotation(
                 dict(font=dict(color='black',size=20, family='Arial'),
@@ -181,9 +181,9 @@ def week_avg(df):
 
 def get_calls():
     df = pd.DataFrame(columns=[
-        'Start Time', 
-        'End Time', 
-        'Duration', 
+        'Start Time',
+        'End Time',
+        'Duration',
         'Weekday'])
 
     df = extract_call_date(data,df)
@@ -194,9 +194,9 @@ def get_calls():
 def draw():
     pass
 
-     
 
-        
+
+
 
 
 def get_duration():
