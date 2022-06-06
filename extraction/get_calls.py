@@ -2,7 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 from extraction.extract_values import extract_values
-from extraction.times import get_times
+from extraction.times import get_times, assign_date_for_midnight
 from utils.console import print_step
 from rich.progress import track
 
@@ -10,8 +10,8 @@ from rich.progress import track
 def get_calls(path, partner_index, my_timezone):
     """ takes json file path as argument 
     open the json file and load into data
-    messages = data['conversations'][0]['MessageList']  (this part should be manually selectable)
-    
+    messages = data['conversations'][partner_index]['MessageList']
+
     for every object in messages
         check if object is a call
         call get_times to fill the dataframe
@@ -49,7 +49,7 @@ def get_calls(path, partner_index, my_timezone):
         df = df.combine_first(calls)
 
     df = fix_old_ids(df)
-    # df = assign_date_for_midnight(df, my_timezone)
+    df = assign_date_for_midnight(df, my_timezone)
     return df
 
 
@@ -62,7 +62,7 @@ def fix_old_ids(df):
     End Time, Duration, Terminator is carried over to the correct call 
     ID and wrong index is dropped
     """
-    print_step("Cleaning up call IDs")
+    print_step("Cleaning up call IDs 🧹")
     for index, row in track(df.iterrows(), total=len(df), description="Cleaning up"):
         if len(index) <= 13:
             df.loc[df['ID'] == index, 'End Time'] = df.loc[index,'End Time']

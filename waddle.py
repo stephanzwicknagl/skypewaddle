@@ -45,9 +45,12 @@ def main():
             Duration
             Weekday 
     """
-    path = "assets/data/2022-05.json"
+    path = "assets/data/messages.json"
+    # path = "assets/data/mock.json"
+    my_timezone = "Europe/Berlin"
     _, partner_index = extract_conversations(path)
-    df = get_calls(path, partner_index, my_timezone="Europe/Berlin")
+    
+    df = get_calls(path, partner_index, my_timezone)
 
     """ save df as csv """
     df.to_csv("assets/data/dataframe.csv")

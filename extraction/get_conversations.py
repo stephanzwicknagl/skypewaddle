@@ -7,7 +7,7 @@ def extract_conversations(path):
     """
     Extracts all conversations from a file
     """
-    print_step("Gathering conversation partners")
+    print_step("Gathering conversation partners 👥")
     f = open(path, 'r', encoding='utf-8')
     data = json.load(f)
     f.close()
@@ -25,5 +25,5 @@ def extract_conversations(path):
     title = 'Choose the conversation partner: '
     option, _ = pick(options, title)
     index = idxs[option]
-    print_substep("You chose {}".format(option))
+    print_substep("You chose [red]{}".format(option))
     return option,index
