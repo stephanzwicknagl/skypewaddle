@@ -3,6 +3,7 @@ from utils.console import print_step, print_substep
 from pick import pick
 import re
 
+
 def extract_conversations(path):
     """
     Extracts all conversations from a file
@@ -13,10 +14,9 @@ def extract_conversations(path):
     f.close()
     messages = data['conversations']
 
-    
     options = []
     idxs = {}
-    for i in range(0,len(messages)):
+    for i in range(0, len(messages)):
         partner = messages[i]['id']
         if re.search('.skype', partner) is None:
             options.append(partner)
@@ -26,4 +26,4 @@ def extract_conversations(path):
     option, _ = pick(options, title)
     index = idxs[option]
     print_substep("You chose [red]{}".format(option))
-    return option,index
+    return option, index

@@ -14,11 +14,15 @@ from scipy import signal
 # for my_timezone from location
 import pytz
 
+print_markdown("### Thanks for using this tool! 😊 \n\n")
 print_markdown(
-    "### Thanks for using this tool! 😊 \n\n Let's find out how much you skype... \n\n"
+    "### For instructions on how to use this tool visit the repo at [github.com/stephanzwicknagl/skypewaddle](github.com/stephanzwicknagl/skypewaddle)"
 )
+print_markdown("Let's find out how much you skype... 🤔 \n\n")
+
 Path("assets/images").mkdir(parents=True, exist_ok=True)
 Path("assets/data").mkdir(parents=True, exist_ok=True)
+
 
 def calculate_durations(df):
     """ calculates call duration from skype times
@@ -26,14 +30,11 @@ def calculate_durations(df):
     takes filled dataframe df 
     returns dataframe df filled with duration
     """
-    
+
     for index, row in df.iterrows():
         duration = row['End Time'] - row['Start Time']
         df.loc[index, 'Duration'] = float(duration.seconds)
     return df
-
-
-
 
 
 def main():
@@ -49,9 +50,8 @@ def main():
     # path = "assets/data/mock.json"
     my_timezone = "Europe/Berlin"
     _, partner_index = extract_conversations(path)
-    
-    df = get_calls(path, partner_index, my_timezone)
 
+    df = get_calls(path, partner_index, my_timezone)
     """ save df as csv """
     df.to_csv("assets/data/dataframe.csv")
     """ generates images"""

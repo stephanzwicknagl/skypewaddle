@@ -39,18 +39,12 @@ def get_times(obj, my_timezone):
     if event_category == 'started':
         try:
             calls = pd.DataFrame(data={
-                'Call ID':
-                call_id,
-                'ID':
-                id_sec,
-                'Start Time':
-                time,
-                'End Time':
-                np.nan,
-                'Caller':
-                val_from,
-                'Weekday':
-                time.weekday(),
+                'Call ID': call_id,
+                'ID': id_sec,
+                'Start Time': time,
+                'End Time': np.nan,
+                'Caller': val_from,
+                'Weekday': time.weekday(),
             },
                                  index=['Call ID'])
         except pytz.exceptions.AmbiguousTimeError:
@@ -63,19 +57,13 @@ def get_times(obj, my_timezone):
             duration = 0
         try:
             calls = pd.DataFrame(data={
-                'Call ID':
-                call_id,
-                'ID':
-                id_sec,
-                'Start Time':
-                np.nan,
-                'End Time':
-                time,
-                'Duration':
-                duration,
-                'Terminator':
-                val_from
-                },
+                'Call ID': call_id,
+                'ID': id_sec,
+                'Start Time': np.nan,
+                'End Time': time,
+                'Duration': duration,
+                'Terminator': val_from
+            },
                                  index=['Call ID'])
         except pytz.exceptions.AmbiguousTimeError:
             return None
@@ -121,8 +109,7 @@ def assign_date_for_midnight(df, my_timezone):
                     hour=0,
                     minute=0,
                     second=0,
-                ).astimezone(
-                    pytz.timezone(my_timezone))
+                ).astimezone(pytz.timezone(my_timezone))
             except:
                 continue
             end_time_new = row['End Time']
@@ -153,7 +140,9 @@ def assign_date_for_midnight(df, my_timezone):
                 'Caller': [caller_pre, np.nan],
                 'Terminator': [np.nan, terminator_new],
                 'Duration': [duration_pre, duration_new],
-                'Weekday': [start_time_pre.weekday(), start_time_new.weekday()],
+                'Weekday':
+                [start_time_pre.weekday(),
+                 start_time_new.weekday()],
             },
                                 index=[call_id_pre, call_id_new])
             call.set_index('Call ID', inplace=True)
