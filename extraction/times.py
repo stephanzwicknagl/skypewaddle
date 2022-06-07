@@ -9,20 +9,15 @@ from extraction.extract_values import extract_values
 
 
 def get_times(obj, my_timezone):
-    """ takes an object from the json file and analyzes it
+    """ takes one object from the json file and analyzes it
     
-    takes an object from json-messages-file 
-    returns df call
-    get call ID
-        call[0] = call ID
-        call
-    is call starting?
-        call[1] = datetime
-        who called?
-    is call ending?
-        call[2] = datetime
-        who hung up?
-    return call
+    Arguments:
+        obj {dict} -- one object from the json file
+        my_timezone {str} -- timezone of interest
+    
+    Returns:
+        pd.DataFrame -- dataframe with call data
+                        [ID, Start Time, End Time, Duration, Weekday, Caller Terminator]
     """
 
     content = (extract_values(obj, 'content'))[0]
@@ -94,57 +89,66 @@ def get_call_time(obj, my_timezone):
 
 
 def assign_date_for_midnight(df, my_timezone):
+    """Split calls that span over two days at midnight
+    
+    Arguments:
+        df {pd.DataFrame} -- dataframe with call data
+        my_timezone {str} -- timezone of interest
+        
+    Returns:
+        pd.DataFrame -- dataframe with call data
+    """
+
     print_step("Figuring out the days 📅")
     for index, row in track(df.iterrows(),
                             total=len(df),
                             description="Dating calls"):
         if row['Start Time'].date() != row['End Time'].date():
-            call_id_new = index + '_2'
-            date_new = row['End Time'].date()
+            callid_2 = index + '_2'
+            date_2 = row['End Time'].date()
             try:
-                start_time_new = datetime.datetime(
-                    year=date_new.year,
-                    month=date_new.month,
-                    day=date_new.day,
+                starttime_2 = datetime.datetime(
+                    year=date_2.year,
+                    month=date_2.month,
+                    day=date_2.day,
                     hour=0,
                     minute=0,
                     second=0,
                 ).astimezone(pytz.timezone(my_timezone))
             except:
                 continue
-            end_time_new = row['End Time']
-            duration_new = float((end_time_new - start_time_new).seconds)
-            terminator_new = row['Terminator']
+            endtime_2 = row['End Time']
+            duration_2 = float((endtime_2 - starttime_2).seconds)
+            terminator_2 = row['Terminator']
 
-            call_id_pre = index + '_1'
-            start_time_pre = row['Start Time']
-            date_pre = row['Start Time'].date()
+            callid_1 = index + '_1'
+            starttime_1 = row['Start Time']
+            date_1 = row['Start Time'].date()
             try:
-                end_time_pre = datetime.datetime(
-                    year=date_pre.year,
-                    month=date_pre.month,
-                    day=date_pre.day,
+                endtime_1 = datetime.datetime(
+                    year=date_1.year,
+                    month=date_1.month,
+                    day=date_1.day,
                     hour=23,
                     minute=59,
                     second=59,
                 ).astimezone(pytz.timezone(my_timezone))
             except:
                 continue
-            duration_pre = row['Duration'] - duration_new
-            caller_pre = row['Caller']
+            duration_1 = float((endtime_1 - starttime_1).seconds)
+            caller_1 = row['Caller']
 
             call = pd.DataFrame(data={
-                'Call ID': [call_id_pre, call_id_new],
-                'Start Time': [start_time_pre, start_time_new],
-                'End Time': [end_time_pre, end_time_new],
-                'Caller': [caller_pre, np.nan],
-                'Terminator': [np.nan, terminator_new],
-                'Duration': [duration_pre, duration_new],
-                'Weekday':
-                [start_time_pre.weekday(),
-                 start_time_new.weekday()],
+                'Call ID': [callid_1, callid_2],
+                'Start Time': [starttime_1, starttime_2],
+                'End Time': [endtime_1, endtime_2],
+                'Caller': [caller_1, np.nan],
+                'Terminator': [np.nan, terminator_2],
+                'Duration': [duration_1, duration_2],
+                'Weekday': [starttime_1.weekday(),
+                            starttime_2.weekday()],
             },
-                                index=[call_id_pre, call_id_new])
+                                index=[callid_1, callid_2])
             call.set_index('Call ID', inplace=True)
 
             df = df.drop(index)

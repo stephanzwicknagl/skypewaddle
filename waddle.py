@@ -3,8 +3,7 @@ from pathlib import Path
 from utils.console import print_markdown
 from extraction.get_conversations import extract_conversations
 from extraction.get_calls import get_calls
-# import json
-# import datetime
+from creation.dates_plot import date_graph 
 import numpy as np
 import pandas as pd
 from pandas.core.frame import DataFrame
@@ -46,8 +45,8 @@ def main():
             Duration
             Weekday 
     """
-    path = "assets/data/messages.json"
-    # path = "assets/data/mock.json"
+    # path = "assets/data/messages.json"
+    path = "tests/test_data/mock.json"
     my_timezone = "Europe/Berlin"
     _, partner_index = extract_conversations(path)
 
@@ -55,6 +54,7 @@ def main():
     """ save df as csv """
     df.to_csv("assets/data/dataframe.csv")
     """ generates images"""
+    # date_graph(df)
 
 
 if __name__ == "__main__":

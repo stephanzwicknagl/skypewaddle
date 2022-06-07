@@ -4,9 +4,17 @@ from pick import pick
 import re
 
 
-def extract_conversations(path):
+def extract_conversations(path, test=False):
     """
-    Extracts all conversations from a file
+    Extracts all conversation partners from file and lets user choose one.
+
+    Arguments:
+        path {str} -- path to json file from skype structure ['conversations']
+        teset {bool} -- if True, then function returns before user input
+
+    Returns:
+        option -- the conversation partner picked or if test list of all conversation partners
+        indexes -- index of the chosen partner or if test a dictionary with all conversation partner as key and their index as value
     """
     print_step("Gathering conversation partners 👥")
     f = open(path, 'r', encoding='utf-8')
@@ -22,8 +30,12 @@ def extract_conversations(path):
             options.append(partner)
             idxs[partner] = i
 
-    title = 'Choose the conversation partner: '
-    option, _ = pick(options, title)
+    # if test, return before asking for user input
+    if test:
+        return options, idxs
+
+    # get user input
+    option, _ = pick(options, 'Choose the conversation partner: ')
     index = idxs[option]
     print_substep("You chose [red]{}".format(option))
     return option, index
