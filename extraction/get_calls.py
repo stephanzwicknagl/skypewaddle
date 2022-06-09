@@ -54,6 +54,10 @@ def get_calls(path, partner_index, my_timezone):
         # if call id already exists, then combine lines
         df = df.combine_first(calls)
 
+    if df.isna().sum().sum() > 0.1 * len(df) * len(df.columns):
+        # print("Warning: There are some missing values in the call dataframe.")
+        raise ValueError("There are too many missing values in the call dataframe.")
+
     # some old calls don't reference call id carry information over
     df = fix_old_ids(df)
 
