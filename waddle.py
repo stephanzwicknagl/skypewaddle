@@ -45,8 +45,8 @@ def main():
             Duration
             Weekday 
     """
-    # path = "assets/data/messages.json"
-    path = "tests/test_data/mock.json"
+    path = "assets/data/messages.json"
+    # path = "tests/test_data/mock.json"
     my_timezone = "Europe/Berlin"
     _, partner_index = extract_conversations(path)
 
