@@ -152,6 +152,6 @@ def assign_date_for_midnight(df, my_timezone):
             call.set_index('Call ID', inplace=True)
 
             df = df.drop(index)
-            df = df.append(call)
+            df = pd.concat([df, call])
 
     return df

@@ -2,9 +2,11 @@ import json
 from utils.console import print_step, print_substep
 from pick import pick
 import re
+import io
+import base64
 
 
-def extract_conversations(path, test=False):
+def extract_conversations(coded_data, test=False):
     """
     Extracts all conversation partners from file and lets user choose one.
 
@@ -16,10 +18,8 @@ def extract_conversations(path, test=False):
         option -- the conversation partner picked or if test list of all conversation partners
         indexes -- index of the chosen partner or if test a dictionary with all conversation partner as key and their index as value
     """
-    print_step("Gathering conversation partners 👥")
-    f = open(path, 'r', encoding='utf-8')
-    data = json.load(f)
-    f.close()
+    decoded_data = base64.b64decode(coded_data)
+    data = json.load(io.BytesIO(decoded_data))
     messages = data['conversations']
 
     options = []
@@ -31,11 +31,4 @@ def extract_conversations(path, test=False):
             idxs[partner] = i
 
     # if test, return before asking for user input
-    if test:
-        return options, idxs
-
-    # get user input
-    option, _ = pick(options, 'Choose the conversation partner: ')
-    index = idxs[option]
-    print_substep("You chose [red]{}".format(option))
-    return option, index
+    return options, idxs
