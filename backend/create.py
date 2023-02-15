@@ -7,7 +7,7 @@ from scipy import signal
 
 
 def date_graph(df):
-
+    
     dates = np.array(df['Start Time'])
     # dates = dates.astype(datetime.datetime)
     durations = list(df.loc[:, 'Duration'])
@@ -52,8 +52,9 @@ def date_graph(df):
     # fig_lin.update_yaxes(type="log")
     # fig_bin.show()
     # fig_lin.show()
-    fig_lin.write_image("images/fig_lin.png")
-    fig_bin.write_image("images/fig_bin.png")
+    # fig_lin.write_image("images/fig_lin.png")
+    # fig_bin.write_image("images/fig_bin.png")
 
     # fig_heat.show()
     # return all_days
+    return fig_lin

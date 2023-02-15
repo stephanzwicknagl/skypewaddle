@@ -1,3 +1,5 @@
-assets/
 todo.txt
 *.pyc
+assets/data
+assets/images
+cache

@@ -86,7 +86,6 @@ def get_calls(set_progress, contents, partner_index, my_timezone):
         df = df.combine_first(calls)
 
     if df.isna().sum().sum() > 0.1 * len(df) * len(df.columns):
-        # print("Warning: There are some missing values in the call dataframe.")
         raise ValueError(
             "There are too many missing values in the call dataframe.")
 
@@ -108,9 +107,7 @@ def fix_old_ids(df):
     End Time, Duration, Terminator is carried over to the correct call 
     ID and wrong index is dropped
     """
-    for index, row in track(df.iterrows(),
-                            total=len(df),
-                            description="Cleaning up"):
+    for index, row in df.iterrows():
         if len(index) <= 13:
             df.loc[df['ID'] == index, 'End Time'] = df.loc[index, 'End Time']
             df.loc[df['ID'] == index, 'Duration'] = df.loc[index, 'Duration']
@@ -239,10 +236,7 @@ def assign_date_for_midnight(df, my_timezone):
         pd.DataFrame -- dataframe with call data
     """
 
-    print_step("Figuring out the days 📅")
-    for index, row in track(df.iterrows(),
-                            total=len(df),
-                            description="Dating calls"):
+    for index, row in df.iterrows():
         if row['Start Time'].date() != row['End Time'].date():
             callid_2 = index + '_2'
             date_2 = row['End Time'].date()

@@ -3,14 +3,14 @@
 
 from dash import Dash, html, dcc
 import pandas as pd
-from backend import extract
+from backend import extract, create
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 import os
 import dash_bootstrap_components as dbc
 from dash import DiskcacheManager, CeleryManager, Input, Output, html
 from dash_iconify import DashIconify
-
+from pytz import timezone as pytztimezone, UnknownTimeZoneError
 
 if 'REDIS_URL' in os.environ:
     # Use Redis & Celery if REDIS_URL set as an env variable
@@ -29,17 +29,31 @@ app = Dash(__name__,
            update_title="Loading...",
            external_stylesheets=[dbc.themes.LUMEN])
 
+app.clientside_callback(
+    """
+    function(n_clicks) { 
+        const obj = new Object();         
+        obj.clientside_timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        return obj;
+    }
+    """,
+    Output('clientside-timezone', 'data'),
+    Input('submit-participant', 'n_clicks'),
+)
+
 app.layout = html.Div(children=[
+    dcc.Store(id='clientside-timezone', storage_type='session'),
     dbc.Container([
         dbc.Row([
-            DashIconify(icon="material-symbols:info", className="info", style={"color": "#00aff0"})
+            DashIconify(icon="material-symbols:info",
+                        className="info",
+                        style={"color": "#00aff0"})
         ]),
-
         dbc.Row([
             html.H1(children='Skype Waddle', style={'textAlign': 'center'}),
-            html.H3(children='Analyze your Skype habits...', style={'textAlign': 'center'})
+            html.H3(children='Analyze your Skype habits...',
+                    style={'textAlign': 'center'})
         ]),
-
         dbc.Row([
             html.Div(id='data-step',
                      children=[
@@ -51,14 +65,19 @@ app.layout = html.Div(children=[
                                     ]),
                                     className="upload")
                      ],
-                     style={'display': 'none', 'textAlign': 'center'}),
+                     style={
+                         'display': 'none',
+                         'textAlign': 'center'
+                     }),
             html.Div(
                 id='select-participant',
                 children=[
-                    html.H3(children='Select your conversation partner 👥 ', style={"textAlign": "center"}),
+                    html.H3(children='Select your conversation partner 👥 ',
+                            style={"textAlign": "center"}),
                     dcc.Dropdown(id='participant_DD', className='dropdown')
                 ],
-                style={'display': 'none'})]),
+                style={'display': 'none'})
+        ]),
         dbc.Row([
             html.Div(id='confirm-select',
                      children=[
@@ -66,20 +85,32 @@ app.layout = html.Div(children=[
                                      id='submit-participant',
                                      n_clicks=0,
                                      className='button',
-                                     style={'display': 'block', 'margin': 'auto'})
+                                     style={
+                                         'display': 'block',
+                                         'margin': 'auto'
+                                     })
                      ],
                      style={'display': 'none'}),
-            html.Div(id='test')]),
+            html.Div(id='test')
+        ]),
         dbc.Row([
             dcc.Interval(id="progress-interval", n_intervals=0, interval=500),
             dbc.Progress(id='progress-bar',
-                          animated=True,
-                          striped=True,
-                          class_name='progress',
-                          style={'display': 'none'}),
+                         animated=True,
+                         striped=True,
+                         class_name='progress',
+                         style={'display': 'none'}),
             dcc.Graph(id='weekday-graph', style={'display': 'none'}),
-        ], justify="center", align="center")
-    ],  style={"height": "100vh", "position": "relative"})
+        ],
+                justify="center",
+                align="center"),
+        dbc.Row(
+            [html.Div(id='date-time-title', style={'textAlign': 'center'})])
+    ],
+                  style={
+                      "height": "100vh",
+                      "position": "relative"
+                  })
 ])
 
 @app.callback(Output('data-step', 'style'),
@@ -89,8 +120,9 @@ app.layout = html.Div(children=[
               Output('weekday-graph', 'style'),
               Input('upload-data', 'contents'),
               Input('participant_DD', 'value'),
-              Input('submit-participant', 'n_clicks'))
-def render_site_content(contents, participant_value, n_clicks):
+              Input('submit-participant', 'n_clicks'),
+              Input('weekday-graph', 'figure'))
+def render_site_content(contents, participant_value, n_clicks, weekday_figure):
     show = {'display': 'block'}
     hide = {'display': 'none'}
 
@@ -111,6 +143,9 @@ def render_site_content(contents, participant_value, n_clicks):
     if n_clicks:
         out['progress-bar'] = show
 
+    if weekday_figure is not None:
+        out['weekday-graph'] = show
+
     return [out[k] for k in out]
 
 @app.callback(Output('participant_DD', 'options'),
@@ -124,9 +159,11 @@ def on_upload(contents):
 
 
 @app.callback(Output('test','children'),
+              Output('weekday-graph', 'figure'),
               Input('submit-participant', 'n_clicks'),
               State('participant_DD', 'value'),
               State('upload-data', 'contents'),
+              State('clientside-timezone', 'data'),
               background=True, manager=background_callback_manager,
               running=[(
                     Output("progress-bar", "style"),
@@ -135,15 +172,23 @@ def on_upload(contents):
                 )],
               progress=[Output("progress-bar", "value"), Output("progress-bar", "max")],
               prevent_initial_call=True)
-def on_participant_select(update_progress, n_clicks, value, contents):
+def on_participant_select(update_progress, n_clicks, value, contents, timezone):
+    # check if the timezone is valid:
+    try: 
+        pytztimezone(timezone['clientside_timezone'])
+    except UnknownTimeZoneError:
+        timezone['clientside_timezone'] = 'UTC'
+
     if value is not None and n_clicks > 0:
-        # call function extraction.get_calls asynchronously
-        df = extract.get_calls(update_progress, contents, value, "Europe/Berlin")
+        df = extract.get_calls(update_progress, contents, value, timezone['clientside_timezone'])
+        df.to_csv("test.csv")
+
+        fig = create.date_graph(df)
         children = [
             html.H3(children='First few lines of partners'),
             html.Div(str(df.head()))
         ]
-        return children
+        return children, fig
     raise PreventUpdate
 
 if __name__ == '__main__':
