@@ -1,0 +1,49 @@
+.upload {
+    position: absolute;
+    width: 90%;
+    height: 60px;
+    line-height: 60px;
+    border-width: 1px;
+    border-style: dashed;
+    border-radius: 5px;
+    text-align: center;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.dropdown {
+    position: relative;
+    width: 60%;
+    margin: auto;
+    text-align: center;
+}
+
+.button {
+    position: relative;
+    width: 40%;
+    height: 60px;
+    line-height: 60px;
+    border-radius: 5px;
+    text-align: center;
+    margin: auto;
+    cursor: pointer;
+}
+
+.progress {
+    position: relative;
+    text-align: center;
+    width: 30%;
+    padding:0%;
+}
+.info {
+    position: absolute;
+    width: auto;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+}
+
+.row {
+    position: relative;
+    padding:15px;
+}
