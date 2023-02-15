@@ -1,11 +1,151 @@
+import base64
+import io
+import json
+import re
+
+import numpy as np
 import pandas as pd
+from rich.progress import track
+
 import datetime
 import re
+
 import numpy as np
+import pandas as pd
 import pytz
-from rich.progress import track
+
 from utils.console import print_step
-from extraction.extract_values import extract_values
+
+
+def extract_conversations(contents):
+    """
+    Extracts all conversation partners from file and lets user choose one.
+
+    Arguments:
+        path {str} -- path to json file from skype structure ['conversations']
+        teset {bool} -- if True, then function returns before user input
+
+    Returns:
+        option -- the conversation partner picked or if test list of all conversation partners
+        indexes -- index of the chosen partner or if test a dictionary with all conversation partner as key and their index as value
+    """
+    _, content_string = contents.split(',')
+    decoded_data = base64.b64decode(content_string)
+    data = json.load(io.BytesIO(decoded_data))
+    messages = data['conversations']
+
+    idxs = {}
+    for i in range(0, len(messages)):
+        partner = messages[i]['id']
+        if re.search('.skype', partner) is None:
+            idxs[partner] = i
+    return idxs
+
+
+def get_calls(set_progress, contents, partner_index, my_timezone):
+    """ takes json file path and extracts call data
+
+    Arguments:
+        path {str} -- path to json file from skype structure ['conversations'][partner_index]['MessageList']
+        partner_index {str} -- index of the conversation partner
+        my_timezone {str} -- timezone of interest
+
+    Returns:
+        pd.DataFrame -- dataframe with call data
+    """
+
+    # initialize dataframe
+    df = pd.DataFrame(columns=[
+        'Call ID', 'ID', 'Start Time', 'End Time', 'Duration', 'Weekday',
+        'Caller', 'Terminator'
+    ])
+    df.set_index('Call ID', inplace=True)
+
+    _, coded_data = contents.split(',')
+    decoded_data = base64.b64decode(coded_data)
+    data = json.load(io.BytesIO(decoded_data))
+    messages = data['conversations'][partner_index]['MessageList']
+
+    # iterate over messages with a progress bar
+    for i,obj in enumerate(messages):
+        set_progress((str(i), str(len(messages))))
+        # not-calls are ignored
+        if not is_call(obj):
+            continue
+
+        # extract call data
+        calls = get_times(obj, my_timezone)
+
+        # missed calls are ignored
+        # if call is missed/etc. calls is empty
+        if calls is None:
+            continue
+
+        # update dataframe with the call
+        # if call id already exists, then combine lines
+        df = df.combine_first(calls)
+
+    if df.isna().sum().sum() > 0.1 * len(df) * len(df.columns):
+        # print("Warning: There are some missing values in the call dataframe.")
+        raise ValueError(
+            "There are too many missing values in the call dataframe.")
+
+    # some old calls don't reference call id carry information over
+    df = fix_old_ids(df)
+
+    # calls that span over two days are split at midnight
+    df = assign_date_for_midnight(df, my_timezone)
+
+    return df
+
+
+def fix_old_ids(df):
+    """This function carries the information
+    from the end directive to the correct call id
+    
+    some end call directives do not referernce the call id, but the 
+    message id of the start directive. 
+    End Time, Duration, Terminator is carried over to the correct call 
+    ID and wrong index is dropped
+    """
+    for index, row in track(df.iterrows(),
+                            total=len(df),
+                            description="Cleaning up"):
+        if len(index) <= 13:
+            df.loc[df['ID'] == index, 'End Time'] = df.loc[index, 'End Time']
+            df.loc[df['ID'] == index, 'Duration'] = df.loc[index, 'Duration']
+            df.loc[df['ID'] == index, 'Terminator'] = df.loc[index,
+                                                             'Terminator']
+            df.drop(index, inplace=True)
+
+    return df
+
+
+def is_call(obj):
+    if (extract_values(obj, "messagetype") == ['Event/Call']):
+        return True
+    return False
+
+
+def extract_values(obj, key):
+    """Pull all values of specified key from nested JSON."""
+    arr = []
+
+    def extract(obj, arr, key):
+        """Recursively search for values of key in JSON tree."""
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                if isinstance(v, (dict, list)):
+                    extract(v, arr, key)
+                elif k == key:
+                    arr.append(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                extract(item, arr, key)
+        return arr
+
+    results = extract(obj, arr, key)
+    return results
 
 
 def get_times(obj, my_timezone):
