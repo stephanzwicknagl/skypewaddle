@@ -1,8 +1,8 @@
-todo.txt
 *.pyc
 .env
 .DS_Store
 venv
-assets/data
-assets/images
+tests/data
+tests/images
 cache
+.vscode
