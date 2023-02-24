@@ -1,5 +1,8 @@
 todo.txt
 *.pyc
+.env
+.DS_Store
+venv
 assets/data
 assets/images
 cache
