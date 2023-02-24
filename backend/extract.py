@@ -64,8 +64,10 @@ def get_calls(set_progress, conversations, partner_index, my_timezone):
             continue
 
         # extract call data
-        calls = get_times(obj, my_timezone)
-
+        try:
+            calls = get_times(obj, my_timezone)
+        except IndexError:
+            raise ValueError
         # missed calls are ignored
         # if call is missed/etc. calls is empty
         if calls is None:

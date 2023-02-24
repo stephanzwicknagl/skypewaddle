@@ -32,9 +32,10 @@ else:
 app = Dash(__name__,
            title="skype waddle",
            update_title="Loading...",
-           external_stylesheets=[dbc.themes.LUMEN])
+           external_stylesheets=[dbc.themes.LUMEN],
+           background_callback_manager=background_callback_manager)
 
-server = app.server
+# server = app.server
 
 app.clientside_callback(
     """
@@ -48,10 +49,21 @@ app.clientside_callback(
     Input('submit-participant', 'n_clicks'),
 )
 
+app.clientside_callback(
+    """
+    function(data) {
+        console.log(data);
+        return null;
+    }""",
+    Output('data2', 'data'),
+    Input('data', 'data'),
+)
+
 app.layout = html.Div(children=[
     # some local storage
     dcc.Store(id='clientside-timezone', storage_type='memory'),
-    dcc.Store(id='participant-stored', storage_type='memory'),
+    dcc.Store(id='data', storage_type='memory'),
+    dcc.Store(id='data2', storage_type='memory'),
     dcc.Store(id='open-warn', storage_type='memory'),
 
     dbc.Container([
@@ -82,7 +94,8 @@ app.layout = html.Div(children=[
                 id='select-participant',
                 children=[
                     html.H3(children='Select your conversation partner 👥'),
-                    dcc.Dropdown(id='participant_DD', searchable=False, className='dropdown')
+                    # make sure dropdown doesn't cut off at the bottom of the page
+                    dcc.Dropdown(id='participant_DD', searchable=False, className='dropdown'),
                 ],
                 style={'display': 'none'}),
             html.Div(
@@ -104,13 +117,13 @@ app.layout = html.Div(children=[
                          striped=True,
                          class_name='progress',
                          style={'display': 'none'}),
-        ], style={'display': 'none'}),
-        dbc.Row(dcc.Graph(id='calendar-graph'), style={'display': 'none'}),
+        ],style={'display': 'none'}),
+        dbc.Row(id='graph-row', style={'display': 'none'}),
         # dbc.Row(
             # [html.Div(id='date-time-title', style={'textAlign': 'center'})])
     ],
                   style={
-                      "height": "95vh",
+                      "height": "90vh",
                       "position": "relative"
                   })
 ])
@@ -123,10 +136,11 @@ app.layout = html.Div(children=[
               Output('select-participant', 'style'),
               Output('confirm-select', 'style'), 
               Output('progress-bar', 'style'),
+              Output('graph-row', 'style'),
               Input('upload-data', 'contents'), 
               Input('participant_DD','value'),
               Input('submit-participant', 'n_clicks'),
-              Input('calendar-graph', 'figure'))
+              Input('graph-row', 'children'))
 def render_site_content(uploaded_data, participant_value, participant_confirmed,
                         graph_figure):
     show = {'display': 'block'}
@@ -140,6 +154,7 @@ def render_site_content(uploaded_data, participant_value, participant_confirmed,
         'select-participant': hide,
         'confirm-select': hide,
         'progress-bar': hide,
+        'graph-row': hide,
     }
 
     if graph_figure is None:
@@ -163,7 +178,7 @@ def render_site_content(uploaded_data, participant_value, participant_confirmed,
         out['progress-bar'] = show
 
     if graph_figure is not None:
-        out['calendar-graph'] = show
+        out['graph-row'] = show
 
     if graph_figure is not None:
         out['waddle-big-logo'] = hide
@@ -211,27 +226,16 @@ def toggle_warn_modal(n_clicks, open_warn, is_open):
     return is_open
 
 
-@app.callback(Output('participant-stored', 'data'),
-              Input('submit-participant', 'n_clicks'),
-              State('participant_DD', 'options'),
-              State('participant_DD', 'value'))
-def save_participant_select(n_clicks, options, value):
-    if n_clicks:
-        return options[value]
-    raise PreventUpdate
-
-
 @app.callback(
-    Output('calendar-graph', 'figure'),
+    Output('graph-row', 'children'),
     Output('open-warn', 'data'),
     Input('submit-participant', 'n_clicks'),
+    State('participant_DD', 'options'),
     State('participant_DD', 'value'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('clientside-timezone', 'data'),
-    State('participant-stored', 'data'),
     background=True,
-    manager=background_callback_manager,
     running=[(
         Output("progress-bar", "style"),
         {"visibility": "visible"},
@@ -252,8 +256,9 @@ def save_participant_select(n_clicks, options, value):
     progress=[Output("progress-bar", "value"),
               Output("progress-bar", "max")],
     prevent_initial_call=True)
-def on_participant_select(update_progress, n_clicks, value, contents, filename,
-                          timezone, participant):
+def on_participant_select(update_progress, n_clicks, participant_options, 
+                          participant_value, upload_contents, upload_filename,
+                          timezone):
     # check if the timezone is valid:
     try:
         pytztimezone(timezone['clientside_timezone'])
@@ -261,27 +266,63 @@ def on_participant_select(update_progress, n_clicks, value, contents, filename,
         timezone['clientside_timezone'] = 'UTC'
 
 
-    if value is not None and n_clicks > 0:
-        conversations = utils.read_conversations_from_file(contents, filename)
+    if participant_value is not None and n_clicks > 0:
+        conversations = utils.read_conversations_from_file(upload_contents, upload_filename)
         try:
-            df = extract.get_calls(update_progress, conversations, value,
+            df = extract.get_calls(update_progress, conversations, participant_value,
                                timezone['clientside_timezone'])
         except ValueError:
             return None, True
-        # get type of weekday column in df
-        df.to_csv("test.csv")
+        plots ={
+            'duration-plot': create.duration_plot(df),
+            'weekday-plot': create.weekday_plot(df),
+            'calendar-plot': create.calendar_plot(df),
+            'terminator-plot': create.terminator_plot(df, participant_options[participant_value]),
+            'caller-plot': create.caller_plot(df, participant_options[participant_value]),
+        }
+        tabs = dbc.Tabs(
+            [
+                dbc.Tab(label="Duration", tab_id="duration-plot", children=plots['duration-plot']),
+                dbc.Tab(label="Weekday", tab_id="weekday-plot", children=plots['weekday-plot']),
+                dbc.Tab(label="Calendar", tab_id="calendar-plot", children=plots['calendar-plot']),
+                dbc.Tab(label="Terminator", tab_id="terminator-plot", children=plots['terminator-plot']),
+                dbc.Tab(label="Caller", tab_id="caller-plot", children=plots['caller-plot']),
+            ]
+        )
 
-        # calendar_plot = create.calendar_plot(df)
-        # return calendar_plot, False
-        # duration_plot = create.duration_plot(df)
-        # return duration_plot, False
-        # weekday_plot = create.weekday_plot(df)
-        # return weekday_plot, False
-        terminator_plot = create.terminator_plot(df, participant)
-        return terminator_plot, False
+        return tabs, False
 
     raise PreventUpdate
 
+@app.callback(
+    Output('data', 'data'),
+    Input('waddle-big-logo', 'children'),
+    State('data', 'data')
+)
+def console_log(children, data):
+    if children is not None and data is None:
+        printstr = r"""
+                         __                          __
+          _      _____  / /________  ____ ___  ___  / /
+         | | /| / / _ \/ / ___/ __ \/ __ `__ \/ _ \/ / 
+         | |/ |/ /  __/ / /__/ /_/ / / / / / /  __/_/  
+         |__/|__/\___/_/\___/\____/_/ /_/ /_/\___(_)   
+                                             
+  _ _ _                _         _                                ___ 
+ | (_) |_____  __ __ _| |_  __ _| |_   _  _ ___ _  _   ___ ___ __|__ \
+ | | | / / -_) \ V  V / ' \/ _` |  _| | || / _ \ || | (_-</ -_) -_)/_/
+ |_|_|_\_\___|  \_/\_/|_||_\__,_|\__|  \_, \___/\_,_| /__/\___\___(_) 
+                                       |__/                           
+              __    _                             __
+             / /_  (_)_______     ____ ___  ___  / /
+            / __ \/ / ___/ _ \   / __ `__ \/ _ \/ / 
+           / / / / / /  /  __/  / / / / / /  __/_/  
+          /_/ /_/_/_/   \___/  /_/ /_/ /_/\___(_)   
+                                          
+       ------> linkedin.com/in/stephan-zwicknagl <------ """
+        return printstr
+    raise PreventUpdate()
+
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
