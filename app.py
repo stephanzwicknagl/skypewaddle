@@ -4,12 +4,10 @@
 import os
 
 import dash_bootstrap_components as dbc
-import pandas as pd
 from dash import (CeleryManager, Dash, DiskcacheManager, Input, Output, dcc,
                   html)
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from dash_iconify import DashIconify
 from pytz import UnknownTimeZoneError
 from pytz import timezone as pytztimezone
 
@@ -51,115 +49,127 @@ app.clientside_callback(
 )
 
 app.layout = html.Div(children=[
+    # some local storage
     dcc.Store(id='clientside-timezone', storage_type='memory'),
-    dcc.Store(id='participant-store', storage_type='memory'),
+    dcc.Store(id='participant-stored', storage_type='memory'),
     dcc.Store(id='open-warn', storage_type='memory'),
+
     dbc.Container([
-        warn_content,
-        dbc.Row(info_content, style={'padding': '1em 5em 0em 5em'}),
-        dbc.Row(html.Img(src=app.get_asset_url('icon.png'),
-                     className='logo',
-                     alt='Skype Waddle Logo'), style={'padding': '0em 5em 0em 5em'}),
-        dbc.Row([
-            html.H1(children='Skype Waddle', style={'textAlign': 'center'}),
-            html.H3(children='Analyze your Skype habits...',
-                    style={'textAlign': 'center'})
+        # modals for info and warnings
+        dbc.Modal(id="warn-modal", is_open=False, children=warn_content),
+        dbc.Row(id="info-row", children=info_content, style={'padding': '1em 5em 0em 5em'}),
+        dbc.Row(id='waddle-big-logo', children=[html.Img(src=app.get_asset_url('icon.png'),
+                     alt='Skype Waddle Logo', className='logo')], style={'display': 'none'}),
+        dbc.Row(id='tagline', children=[
+            html.H1(children='Skype Waddle'),
+            html.H3(children='Analyze your Skype habits...')
         ]),
-        dbc.Row([
-            html.Div(id='data-step',
-                     children=[
-                         'Upload your data to get started 🚀',
-                         dcc.Upload(id='upload-data',
-                                    max_size=100000000,
-                                    children=html.Div([
-                                        'Drag and Drop or ',
-                                        html.A('Select Files')
-                                    ], style={'textAlign': 'center', 'padding':'1em'}),
-                                    className="upload")
-                     ],
-                     style={
-                         'display': 'none',
-                         'textAlign': 'center'
-                     }),
+        dbc.Row(id='user-input-step', children=[
+            html.Div(
+                id='data-step',
+                children=[
+                    html.H3(children='Upload your data to get started 🚀'),
+                    dcc.Upload(id='upload-data',
+                                max_size=100000000,
+                                children=html.Div([
+                                    'Drag and Drop or ',
+                                    html.A('Select Files')
+                                ], className='upload-text'),
+                                className="upload")
+                ],
+                style={'display': 'none'}),
             html.Div(
                 id='select-participant',
                 children=[
-                    html.H3(children='Select your conversation partner 👥 ',
-                            style={"textAlign": "center"}),
-                    dcc.Dropdown(id='participant_DD', className='dropdown')
+                    html.H3(children='Select your conversation partner 👥'),
+                    dcc.Dropdown(id='participant_DD', searchable=False, className='dropdown')
                 ],
-                style={'display': 'none'})
-        ]),
-        dbc.Row([
-            html.Div(id='confirm-select',
-                     children=[
-                         html.Button('Start Analyzing! 🧮 ',
-                                     id='submit-participant',
-                                     n_clicks=0,
-                                     className='button',
-                                     style={
-                                         'display': 'block',
-                                         'margin': 'auto'
-                                     })
-                     ],
-                     style={'display': 'none'}),
-            html.Div(id='test')
-        ]),
-        dbc.Row([
+                style={'display': 'none'}),
+            html.Div(
+                id='confirm-select',
+                children=[
+                    html.Button(
+                        id='submit-participant',
+                        children='Start Analyzing! 🧮',
+                        n_clicks=0,
+                        className='button'
+                        )
+                    ],
+                style={'display': 'none'}),
+        ],style={'display': 'none'}),
+        dbc.Row(id='progress-row', children=[
             dcc.Interval(id="progress-interval", n_intervals=0, interval=500),
             dbc.Progress(id='progress-bar',
                          animated=True,
                          striped=True,
                          class_name='progress',
                          style={'display': 'none'}),
-            dcc.Graph(id='calendar-graph', style={'display': 'none'}),
-        ],
-                justify="center",
-                align="center"),
+        ], style={'display': 'none'}),
+        dbc.Row(dcc.Graph(id='calendar-graph'), style={'display': 'none'}),
         # dbc.Row(
             # [html.Div(id='date-time-title', style={'textAlign': 'center'})])
     ],
                   style={
-                      "height": "100vh",
+                      "height": "95vh",
                       "position": "relative"
                   })
 ])
 
 
-@app.callback(Output('data-step', 'style'),
+@app.callback(Output('waddle-big-logo', 'style'),
+              Output('tagline', 'style'),
+              Output('user-input-step', 'style'),
+              Output('data-step', 'style'),
               Output('select-participant', 'style'),
               Output('confirm-select', 'style'), 
               Output('progress-bar', 'style'),
-              Output('calendar-graph', 'style'),
               Input('upload-data', 'contents'), 
               Input('participant_DD','value'),
               Input('submit-participant', 'n_clicks'),
               Input('calendar-graph', 'figure'))
-def render_site_content(uploaded_data, participant_value, n_clicks,
-                        weekday_figure):
+def render_site_content(uploaded_data, participant_value, participant_confirmed,
+                        graph_figure):
     show = {'display': 'block'}
     hide = {'display': 'none'}
 
     out = {
+        'waddle-big-logo': show,
+        'tagline': hide,
+        'user-input-step': hide,
         'data-step': hide,
         'select-participant': hide,
         'confirm-select': hide,
         'progress-bar': hide,
-        'calendar-graph': hide
     }
 
-    if uploaded_data is not None and weekday_figure is None:
-        out['select-participant'] = show
-        if participant_value is not None:
-            out['confirm-select'] = show
-    else:
+    if graph_figure is None:
+        out['waddle-big-logo'] = show
+        out['tagline'] = show
+        out['user-input-step'] = show
+
+    if uploaded_data is None:
         out['data-step'] = show
 
-    if n_clicks and weekday_figure is None:
+    if (uploaded_data is not None and
+        participant_confirmed == 0):
+        out['select-participant'] = show
+
+    if (uploaded_data is not None and
+        participant_value is not None and
+        participant_confirmed == 0):
+        out['confirm-select'] = show
+
+    if participant_confirmed and graph_figure is None:
         out['progress-bar'] = show
 
-    if weekday_figure is not None:
+    if graph_figure is not None:
         out['calendar-graph'] = show
+
+    if graph_figure is not None:
+        out['waddle-big-logo'] = hide
+
+    if graph_figure is not None:
+        out['tagline'] = hide
 
     return [out[k] for k in out]
 
@@ -201,7 +211,7 @@ def toggle_warn_modal(n_clicks, open_warn, is_open):
     return is_open
 
 
-@app.callback(Output('participant-store', 'data'),
+@app.callback(Output('participant-stored', 'data'),
               Input('submit-participant', 'n_clicks'),
               State('participant_DD', 'options'),
               State('participant_DD', 'value'))
@@ -219,17 +229,25 @@ def save_participant_select(n_clicks, options, value):
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('clientside-timezone', 'data'),
-    State('participant-store', 'data'),
+    State('participant-stored', 'data'),
     background=True,
     manager=background_callback_manager,
     running=[(
         Output("progress-bar", "style"),
-        {
-            "visibility": "visible"
-        },
-        {
-            "visibility": "hidden"
-        },
+        {"visibility": "visible"},
+        {"visibility": "hidden"},
+    ),(
+        Output('progress-row', 'style'),
+        {'display': 'block'},
+        {'display': 'none'},
+    ),(
+        Output('select-participant', 'style'),
+        {'display': 'none'},
+        {'display': 'none'},
+    ),(
+        Output('submit-participant', 'children'),'Analyzing... 🧮 ', 'Start Analyzing! 🧮 ',
+    ),(
+        Output('submit-participant', 'disabled'),True, False
     )],
     progress=[Output("progress-bar", "value"),
               Output("progress-bar", "max")],
@@ -254,16 +272,16 @@ def on_participant_select(update_progress, n_clicks, value, contents, filename,
         df.to_csv("test.csv")
 
         # calendar_plot = create.calendar_plot(df)
-        # return calendar_plot
+        # return calendar_plot, False
         # duration_plot = create.duration_plot(df)
-        # return duration_plot
+        # return duration_plot, False
         # weekday_plot = create.weekday_plot(df)
-        # return weekday_plot
+        # return weekday_plot, False
         terminator_plot = create.terminator_plot(df, participant)
-        return terminator_plot
+        return terminator_plot, False
 
     raise PreventUpdate
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

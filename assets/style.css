@@ -1,3 +1,27 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+}
+
+H1 {
+    text-align: center;
+}
+
+H2 {
+    text-align: center;
+}
+
+H3 {
+    text-align: center;
+}
+
+H4 {
+    text-align: center;
+}
+
 .upload {
     position: absolute;
     width: fit-content;
@@ -11,6 +35,14 @@
     cursor: pointer;
 }
 
+.upload-text {
+    text-align: center;
+    padding: 1em;
+}
+
+.container .row {
+    padding: 1em 5em 1em 5em;
+}
 @media screen and (max-width:500px) {
     .container .row {
         padding: 2%;
@@ -19,9 +51,10 @@
 
 .logo {
     position: relative;
-    width: 20em;
-    margin: auto;
-    text-align: center;
+    width: 15em;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
     border-radius: 3em;
 }
 
@@ -38,23 +71,28 @@
     height: fit-content;
     min-height: 3em;
     border-radius: 1em;
-    text-align: center;
-    margin: auto;
-    cursor: pointer;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1em;
+    display: block;
 }
 
 .progress {
     position: relative;
-    text-align: center;
-    width: 30%;
-    padding:0%;
+    width: 30em;
+    padding: 0;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
+
 .info {
     position: absolute;
     width: auto;
-    top: 0;
-    right: 0;
+    top: 1em;
+    right: 1em;
     cursor: pointer;
+    z-index: 10;
 }
 
 .row {

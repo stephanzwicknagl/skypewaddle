@@ -26,9 +26,11 @@ Here, you can analyze
 
 """
 
+# type: ignore 
 info_content = [
     html.Div(id="info-open", n_clicks=0, children=[
                 DashIconify(icon="material-symbols:info",
+                height=20,
                 className="info",
                 style={"color": "#00aff0"})
             ]),
@@ -36,7 +38,8 @@ info_content = [
             dbc.ModalHeader(dbc.ModalTitle("How To Use Skype Waddle")),
                 dbc.ModalBody(children=[
                     dcc.Markdown([manual_text, story_text],
-                    style={"overflow": "scroll"})
+                        link_target="_blank",
+                        style={"overflow": "scroll"})
                 ]),
                 dbc.ModalFooter(
                     dbc.Button(
