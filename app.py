@@ -15,6 +15,7 @@ from pytz import timezone as pytztimezone
 
 from backend import create, extract, utils
 from frontend.info import info_content
+from frontend.warn import warn_content
 
 if 'REDIS_URL' in os.environ:
     # Use Redis & Celery if REDIS_URL set as an env variable
@@ -35,6 +36,8 @@ app = Dash(__name__,
            update_title="Loading...",
            external_stylesheets=[dbc.themes.LUMEN])
 
+server = app.server
+
 app.clientside_callback(
     """
     function(n_clicks) { 
@@ -50,7 +53,9 @@ app.clientside_callback(
 app.layout = html.Div(children=[
     dcc.Store(id='clientside-timezone', storage_type='memory'),
     dcc.Store(id='participant-store', storage_type='memory'),
+    dcc.Store(id='open-warn', storage_type='memory'),
     dbc.Container([
+        warn_content,
         dbc.Row(info_content, style={'padding': '1em 5em 0em 5em'}),
         dbc.Row(html.Img(src=app.get_asset_url('icon.png'),
                      className='logo',
@@ -180,8 +185,18 @@ def on_upload(contents, filename):
      Input("info-close", "n_clicks")],
     [State("info-modal", "is_open")],
 )
-def toggle_modal(n1, n2, is_open):
+def toggle_info_modal(n1, n2, is_open):
     if n1 or n2:
+        return not is_open
+    return is_open
+
+@app.callback(
+    Output("warn-modal", "is_open"),
+    [Input("warn-close", "n_clicks"),
+     Input('open-warn', 'data')],
+    [State("warn-modal", "is_open")])
+def toggle_warn_modal(n_clicks, open_warn, is_open):
+    if n_clicks or open_warn:
         return not is_open
     return is_open
 
@@ -198,6 +213,7 @@ def save_participant_select(n_clicks, options, value):
 
 @app.callback(
     Output('calendar-graph', 'figure'),
+    Output('open-warn', 'data'),
     Input('submit-participant', 'n_clicks'),
     State('participant_DD', 'value'),
     State('upload-data', 'contents'),
@@ -226,13 +242,14 @@ def on_participant_select(update_progress, n_clicks, value, contents, filename,
     except UnknownTimeZoneError:
         timezone['clientside_timezone'] = 'UTC'
 
+
     if value is not None and n_clicks > 0:
         conversations = utils.read_conversations_from_file(contents, filename)
         try:
             df = extract.get_calls(update_progress, conversations, value,
                                timezone['clientside_timezone'])
         except ValueError:
-            raise PreventUpdate
+            return None, True
         # get type of weekday column in df
         df.to_csv("test.csv")
 
