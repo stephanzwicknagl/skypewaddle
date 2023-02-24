@@ -5,7 +5,6 @@ import re
 
 import numpy as np
 import pandas as pd
-from rich.progress import track
 
 import datetime
 import re
@@ -14,10 +13,8 @@ import numpy as np
 import pandas as pd
 import pytz
 
-from utils.console import print_step
 
-
-def extract_conversations(contents):
+def extract_conversations(conversations):
     """
     Extracts all conversation partners from file and lets user choose one.
 
@@ -29,20 +26,16 @@ def extract_conversations(contents):
         option -- the conversation partner picked or if test list of all conversation partners
         indexes -- index of the chosen partner or if test a dictionary with all conversation partner as key and their index as value
     """
-    _, content_string = contents.split(',')
-    decoded_data = base64.b64decode(content_string)
-    data = json.load(io.BytesIO(decoded_data))
-    messages = data['conversations']
 
     idxs = {}
-    for i in range(0, len(messages)):
-        partner = messages[i]['id']
+    for i in range(0, len(conversations)):
+        partner = conversations[i]['id']
         if re.search('.skype', partner) is None:
             idxs[partner] = i
     return idxs
 
 
-def get_calls(set_progress, contents, partner_index, my_timezone):
+def get_calls(set_progress, conversations, partner_index, my_timezone):
     """ takes json file path and extracts call data
 
     Arguments:
@@ -61,10 +54,7 @@ def get_calls(set_progress, contents, partner_index, my_timezone):
     ])
     df.set_index('Call ID', inplace=True)
 
-    _, coded_data = contents.split(',')
-    decoded_data = base64.b64decode(coded_data)
-    data = json.load(io.BytesIO(decoded_data))
-    messages = data['conversations'][partner_index]['MessageList']
+    messages = conversations[partner_index]['MessageList']
 
     # iterate over messages with a progress bar
     for i,obj in enumerate(messages):
@@ -163,11 +153,11 @@ def get_times(obj, my_timezone):
     # get caller/terminator of call
     val_from = extract_values(obj, 'from')[0]
     # unique identifier for each call to match start and end later
-    call_id = re.findall('callId=\\"(\S+)\\"', content)[0]
+    call_id = re.findall('callId=\\"(\\S+)\\"', content)[0]
     # secondary id identifier for calls before mid 2019(?)
     id_sec = extract_values(obj, 'id')[0]
 
-    event_category = re.findall('type=\\"(\S+)\\"', content)[0]
+    event_category = re.findall('type=\\"(\\S+)\\"', content)[0]
     if event_category == 'started':
         try:
             calls = pd.DataFrame(data={
