@@ -1,3 +1,0 @@
-Heatmap graph
-
-Caller-Terminator graph (bar chart)
