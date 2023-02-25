@@ -1,4 +1,5 @@
 import re
+import ijson
 
 import numpy as np
 import pandas as pd
@@ -11,34 +12,47 @@ import pandas as pd
 import pytz
 
 
-def extract_conversations(conversations):
+def extract_conversations(data):
     """
     Extracts all conversation partners from file and lets user choose one.
 
     Arguments:
-        path {str} -- path to json file from skype structure ['conversations']
-        teset {bool} -- if True, then function returns before user input
+        data {io.BytesIO} -- 
 
     Returns:
-        option -- the conversation partner picked or if test list of all conversation partners
-        indexes -- index of the chosen partner or if test a dictionary with all conversation partner as key and their index as value
+        conversations {Dict} -- Conversation partners, filtered from some automated skype data
     """
+    conversations = []
+    for prefix, _, value in ijson.parse(data):
+        if prefix == 'conversations.item.id' and re.search('.skype', value) is None:
+            conversations.append(value)
+    return conversations
 
-    idxs = {}
-    for i in range(0, len(conversations)):
-        partner = conversations[i]['id']
-        if re.search('.skype', partner) is None:
-            idxs[partner] = i
-    return idxs
-
-
-def get_calls(set_progress, conversations, partner_index, my_timezone):
-    """ takes json file path and extracts call data
+def get_parser_next(set_progress, parser, upload_size):
+    """ creates ijson parser
 
     Arguments:
-        path {str} -- path to json file from skype structure ['conversations'][partner_index]['MessageList']
-        partner_index {str} -- index of the conversation partner
-        my_timezone {str} -- timezone of interest
+    :param set_progress: function to set progress bar
+    :param parser: enumerator of ijson parser
+    :param upload_size: size of uploaded file
+
+    Returns:
+        ijson.parser.Parser -- ijson parser
+    """
+    i, (prefix, event, value) = next(parser)
+    # Estimate Progress:
+    set_progress((str(i), str(upload_size/40)))
+    return prefix, event, value
+
+def get_calls(set_progress, data, partner_index, my_timezone, upload_size):
+    """ takes data as filelike buffer and extracts call data 
+
+    Arguments:
+    :param set_progress: function to set progress bar
+    :param data: filelike buffer
+    :param partner_index: index of partner in conversations
+    :param my_timezone: timezone of user
+    :param upload_size: size of uploaded file
 
     Returns:
         pd.DataFrame -- dataframe with call data
@@ -51,34 +65,61 @@ def get_calls(set_progress, conversations, partner_index, my_timezone):
     ])
     df.set_index('Call ID', inplace=True)
 
-    messages = conversations[partner_index]['MessageList']
+    parser = enumerate(ijson.parse(data))
 
-    # iterate over messages with a progress bar
-    for i,obj in enumerate(messages):
-        set_progress((str(i), str(len(messages))))
-        # not-calls are ignored
-        if not is_call(obj):
-            continue
+    while True:
+        prefix, event, value = get_parser_next(set_progress, parser, upload_size)
 
-        # extract call data
-        try:
-            calls = get_times(obj, my_timezone)
-        except IndexError:
-            raise ValueError
-        # missed calls are ignored
-        # if call is missed/etc. calls is empty
-        if calls is None:
-            continue
+        if (prefix, value) == ('conversations.item.id', partner_index['label']):
+            id_sec, time, content, message_from = None, None, None, None
 
-        # update dataframe with the call
-        # if call id already exists, then combine lines
-        df = df.combine_first(calls)
+            while prefix != 'conversations.item.MessageList.item':
+                prefix, event, value = get_parser_next(set_progress, parser, upload_size)
 
-    if df.isna().sum().sum() > 0.1 * len(df) * len(df.columns):
-        raise ValueError(
-            "There are too many missing values in the call dataframe.")
+            while prefix.startswith('conversations.item.MessageList.item'):
 
-    # some old calls don't reference call id carry information over
+                # secondary ID
+                if prefix == 'conversations.item.MessageList.item.id':
+                    id_sec = value
+
+                # Call time
+                if prefix == 'conversations.item.MessageList.item.originalarrivaltime':
+                    time = get_call_time(value, my_timezone)
+
+                # Type of message (skips when not a call)
+                if prefix == 'conversations.item.MessageList.item.messagetype':
+                    if value != "Event/Call":
+                        # skip to end_map
+                        while event != 'end_map':
+                            prefix, event, value = get_parser_next(set_progress, parser, upload_size)
+                            
+
+                # Call content
+                if prefix == 'conversations.item.MessageList.item.content':
+                    content = value
+
+                # Call initiator
+                if prefix == 'conversations.item.MessageList.item.from':
+                    message_from = value
+
+                # End of Message Object
+                if event == 'end_map':
+                    if (id_sec is not None and
+                        time is not None and
+                        content is not None and
+                        message_from is not None):
+                        calls = get_call_content(
+                                content,
+                                time,
+                                id_sec,
+                                message_from)
+                        if calls is not None:
+                            df = df.combine_first(calls)
+                    id_sec, time, content, message_from = None, None, None, None
+                prefix, event, value = get_parser_next(set_progress, parser, upload_size)
+            # break, after conversation with id has been parsed
+            break
+
     df = fix_old_ids(df)
 
     # calls that span over two days are split at midnight
@@ -141,7 +182,7 @@ def extract_values(obj, key):
     return results
 
 
-def get_times(obj, my_timezone):
+def get_call_content(content, time, id_sec, message_from):
     """ takes one object from the json file and analyzes it
     
     Arguments:
@@ -153,15 +194,10 @@ def get_times(obj, my_timezone):
                         [ID, Start Time, End Time, Duration, Weekday, Caller Terminator]
     """
 
-    content = (extract_values(obj, 'content'))[0]
     # get datetime of event
-    time = get_call_time(obj, my_timezone)
-    # get caller/terminator of call
-    val_from = extract_values(obj, 'from')[0]
     # unique identifier for each call to match start and end later
     call_id = re.findall('callId=\\"(\\S+)\\"', content)[0]
     # secondary id identifier for calls before mid 2019(?)
-    id_sec = extract_values(obj, 'id')[0]
 
     event_category = re.findall('type=\\"(\\S+)\\"', content)[0]
     if event_category == 'started':
@@ -171,11 +207,12 @@ def get_times(obj, my_timezone):
                 'ID': id_sec,
                 'Start Time': time,
                 'End Time': np.nan,
-                'Caller': val_from,
+                'Caller': message_from,
                 'Weekday': time.weekday(),
             },
                                  index=['Call ID'])
         except pytz.exceptions.AmbiguousTimeError:
+            print("Ambiguous Time Error")
             return None
     elif event_category == 'ended':
         duration = re.findall('<duration>([0-9.]+)</duration>', content)
@@ -190,7 +227,7 @@ def get_times(obj, my_timezone):
                 'Start Time': np.nan,
                 'End Time': time,
                 'Duration': duration,
-                'Terminator': val_from
+                'Terminator': message_from
             },
                                  index=['Call ID'])
         except pytz.exceptions.AmbiguousTimeError:
@@ -201,14 +238,13 @@ def get_times(obj, my_timezone):
     return calls
 
 
-def get_call_time(obj, my_timezone):
-    time = (extract_values(obj, 'originalarrivaltime'))[0]
-    year = int(time[0:4])
-    month = int(time[5:7])
-    day = int(time[8:10])
-    hour = int(time[11:13])
-    minute = int(time[14:16])
-    second = int(time[17:19])
+def get_call_time(time_string, my_timezone):
+    year = int(time_string[0:4])
+    month = int(time_string[5:7])
+    day = int(time_string[8:10])
+    hour = int(time_string[11:13])
+    minute = int(time_string[14:16])
+    second = int(time_string[17:19])
 
     moment = datetime.datetime(year,
                                month,

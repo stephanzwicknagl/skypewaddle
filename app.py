@@ -3,6 +3,7 @@
 
 import json
 import os
+import sys
 
 import dash_bootstrap_components as dbc
 from dash import (CeleryManager, Dash, DiskcacheManager, Input, Output, dcc,
@@ -233,8 +234,8 @@ def render_site_content(uploaded_data, participant_value, participant_confirmed,
               State('upload-data', 'filename'))
 def on_upload(contents, filename):
     if contents is not None:
-        conversations = utils.read_conversations_from_file(contents, filename)
-        participants = extract.extract_conversations(conversations)
+        data = utils.read_data_from_file(contents, filename)
+        participants = extract.extract_conversations(data)
         options = [{
             'label': p,
             'value': idx
@@ -312,10 +313,11 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
         participant_submitted > 0) or 
         plots_storage is not None):
         if plots_storage is None:
-            conversations = utils.read_conversations_from_file(upload_contents, upload_filename)
+            upload_size = sys.getsizeof(upload_contents)
+            data = utils.read_data_from_file(upload_contents, upload_filename)
             try:
-                df = extract.get_calls(update_progress, conversations, participant_value,
-                                timezone['clientside_timezone'])
+                df = extract.get_calls(update_progress, data, participant_options[participant_value],
+                            timezone['clientside_timezone'], upload_size)
             except ValueError:
                 return None, None, True
             plots ={

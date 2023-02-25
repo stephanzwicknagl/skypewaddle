@@ -9,8 +9,7 @@ Try again with a different file.
 
 warn_content = [dbc.ModalHeader(dbc.ModalTitle("Error")),
                 dbc.ModalBody(children=[
-                    dcc.Markdown([warn_text],
-                    style={"overflow": "scroll"})
+                    dcc.Markdown([warn_text])
                 ]),
                 dbc.ModalFooter(
                     dbc.Button(
