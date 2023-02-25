@@ -87,6 +87,13 @@ def get_calls(set_progress, conversations, partner_index, my_timezone):
     # calls that span over two days are split at midnight
     df = assign_date_for_midnight(df, my_timezone)
 
+    df["Start Time"] = pd.to_datetime(df["Start Time"])
+    df["End Time"] = pd.to_datetime(df["End Time"])
+    start_date = df["Start Time"].min().date()
+    end_date = df["Start Time"].max().date()
+    if pd.isnull(start_date) or pd.isnull(end_date):
+        raise ValueError("No calls found in the selected time range.")
+
     return df
 
 

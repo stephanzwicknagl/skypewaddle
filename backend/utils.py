@@ -3,6 +3,10 @@ import tarfile
 import io
 import json
 
+import dash_bootstrap_components as dbc
+from dash import dcc
+from plotly import graph_objects as go
+
 def read_conversations_from_file(contents, filename):
 
     _, content_string = contents.split(',')
@@ -26,3 +30,11 @@ def read_conversations_from_file(contents, filename):
         print("unknown file type")
 
     return data['conversations'] if 'conversations' in data else None
+
+def make_tab(figure: go.Figure):
+    return dbc.Card(
+        dbc.CardBody([
+            dcc.Graph(figure=figure),
+        ]),
+        className="multi-tab",
+    )

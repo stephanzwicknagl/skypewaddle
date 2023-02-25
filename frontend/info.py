@@ -5,16 +5,16 @@ from dash_iconify import DashIconify
 
 
 manual_text = """
-- 🌐 Request and Download your Conversations from Skype (Microsoft). Follow the tutorial [here](https://support.skype.com/en/faq/FA34894/how-do-i-export-or-delete-my-skype-data).
+- 🌐 Request and Download a copy of your Skype chat history from Microsoft. Follow the tutorial [here](https://support.skype.com/en/faq/FA34894/how-do-i-export-or-delete-my-skype-data). (Download your Conversations only)
     - 🕰 It may take a couple hours for Microsoft to serve your request. Just come back here once you have your file.
-- ⬆️ Upload the file in the front page of Skype waddle and get your results.
+- ⬆️ Upload the `.tar` file in the front page of _Skype Waddle_ and get your results.
 - 😀 Enjoy and share!
 
-- 🕐 Some of the results depend on the time zone of your device. Have your partner try it on their end to see their results.
+- 🕐 Some of the results depend on the time zone of your device. If you live in different time zonees, have your partner try it on their end to see their results.
 """
 
 story_text = """
-### The story behind
+### The story behind _Skype Waddle_
 
 My partner and I were in a long distance relationship for 3 years. We used Skype to talk to each other every day. 
 
@@ -22,7 +22,15 @@ During the pandemic, we would talk for hours and hours.
 
 We started to wonder how much we actually skyped. That's why I created this tool.
 
-Here, you can analyze 
+Here, everyone can analyze how much you video chatted with your partner, which weekdays you skyped the most, the duration of your calls over time and more.
+"""
+
+disclaimer_text = """
+### Disclaimer
+
+Your data is processed on the servers of Heroku and is not stored anywhere else. They are only used to generate the graphs and deleted afterwards. The graphs are then stored on your device, so feel free to come back.
+
+This tool is not affiliated with Microsoft or Skype. It is not endorsed by Microsoft or Skype. It is not sponsored by Microsoft or Skype.
 
 """
 
@@ -35,11 +43,10 @@ info_content = [
                 style={"color": "#00aff0"})
             ]),
     dbc.Modal(id="info-modal", is_open=False, children=[
-            dbc.ModalHeader(dbc.ModalTitle("How To Use Skype Waddle")),
+            dbc.ModalHeader(dbc.ModalTitle(["How To Use ", html.Em("Skype Waddle")])),
                 dbc.ModalBody(children=[
-                    dcc.Markdown([manual_text, story_text],
-                        link_target="_blank",
-                        style={"overflow": "scroll"})
+                    dcc.Markdown([manual_text, story_text, disclaimer_text],
+                        link_target="_blank")
                 ]),
                 dbc.ModalFooter(
                     dbc.Button(

@@ -1,15 +1,13 @@
 from datetime import date
 from typing import Dict, cast
 
-import dash_bootstrap_components as dbc
-from dash import dcc
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from plotly_calplot import calplot
 
 
-def weekday_plot(df):
+def weekday_plot(df: pd.DataFrame) -> go.Figure:
     week = pd.DataFrame(
         {
             'Day': [
@@ -46,19 +44,10 @@ def weekday_plot(df):
                       title=f"Your favorite skype-day is {week.loc[:,'Duration'].idxmax()}")
     fig.update_xaxes(title_text=f"{unit} skyped", title_font={"size": 14})
 
-    tab_content = dbc.Card(
-        dbc.CardBody([
-            dcc.Graph(figure=fig),
-        ]),
-        className="multi-tab",
-    )
-
-    return tab_content
+    return fig
 
 
-def calendar_plot(df):
-    df["Start Time"] = pd.to_datetime(df["Start Time"])
-    df["End Time"] = pd.to_datetime(df["End Time"])
+def calendar_plot(df: pd.DataFrame) -> go.Figure:
     start_date = df["Start Time"].min().date()
     end_date = df["Start Time"].max().date()
 
@@ -84,17 +73,11 @@ def calendar_plot(df):
         plot_bgcolor='rgb(248, 248, 255)',
         margin=dict(l=0, r=0, t=0, b=0),
     )
-    tab_content_allyears = dbc.Card(
-        dbc.CardBody([
-            dcc.Graph(figure=fig),
-        ]),
-        className="multi-tab",
-    )
 
-    return tab_content_allyears
+    return fig
 
 
-def duration_plot(df):
+def duration_plot(df: pd.DataFrame) -> go.Figure:
     sum = df["Duration"].sum()
     unit = "hours" if sum > 3600 else "minutes"
     sum = sum / 3600 if sum > 3600 else sum / 60
@@ -132,17 +115,10 @@ def duration_plot(df):
     fig.update_layout(paper_bgcolor='rgb(248, 248, 255)',
                       plot_bgcolor='rgb(248, 248, 255)')
 
-    tab_content = dbc.Card(
-        dbc.CardBody([
-            dcc.Graph(figure=fig),
-        ]),
-        className="multi-tab",
-    )
-
-    return tab_content
+    return fig
 
 
-def terminator_plot(df: pd.DataFrame, participant: Dict[str, str]):
+def terminator_plot(df: pd.DataFrame, participant: Dict[str, str])  -> go.Figure:
     """
     Plot a bar chart comparing the number of "terminations" per person.
     A termination is defined as a call that was hung up by one of the participants.
@@ -172,17 +148,10 @@ def terminator_plot(df: pd.DataFrame, participant: Dict[str, str]):
                        arrowsize=3,
                        arrowhead=1)
 
-    tab_content = dbc.Card(
-        dbc.CardBody([
-            dcc.Graph(figure=fig),
-        ]),
-        className="multi-tab",
-    )
-
-    return tab_content
+    return fig
 
 
-def caller_plot(df: pd.DataFrame, participant: Dict[str, str]):
+def caller_plot(df: pd.DataFrame, participant: Dict[str, str]) -> go.Figure:
     """
     Plot a bar chart comparing the number of call initiations per person.
     """
@@ -211,11 +180,4 @@ def caller_plot(df: pd.DataFrame, participant: Dict[str, str]):
                        arrowsize=3,
                        arrowhead=1)
         
-    tab_content = dbc.Card(
-        dbc.CardBody([
-            dcc.Graph(figure=fig),
-        ]),
-        className="multi-tab",
-    )
-
-    return tab_content
+    return fig

@@ -1,8 +1,5 @@
 import unittest
 import pandas as pd
-import extraction.get_conversations
-import extraction.get_calls
-import numpy as np
 import os
 
 
