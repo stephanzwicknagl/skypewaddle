@@ -1,11 +1,8 @@
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
 
-from base64 import b64encode
-import base64
 import json
 import os
-import zipfile
 
 import dash_bootstrap_components as dbc
 from dash import (CeleryManager, Dash, DiskcacheManager, Input, Output, dcc,
@@ -458,4 +455,4 @@ def console_log(children, data):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
