@@ -35,7 +35,7 @@ app = Dash(__name__,
            external_stylesheets=[dbc.themes.LUMEN],
            background_callback_manager=background_callback_manager)
 
-# server = app.server
+server = app.server
 
 app.clientside_callback(
     """
@@ -69,9 +69,14 @@ app.layout = html.Div(children=[
     dbc.Container([
         # modals for info and warnings
         dbc.Modal(id="warn-modal", is_open=False, children=warn_content),
-        dbc.Row(id="info-row", children=info_content, style={'padding': '1em 5em 0em 5em'}),
-        dbc.Row(id='waddle-big-logo', children=[html.Img(src=app.get_asset_url('icon.png'),
-                     alt='Skype Waddle Logo', className='logo')], style={'display': 'none'}),
+        dbc.Row(id="info-row", 
+                children= info_content + [
+                    html.Div(id='waddle-big-logo', children=[html.Img(src=app.get_asset_url('icon.png'),
+                     alt='Skype Waddle Logo', className='logo-big')], style={'display': 'none'}),
+                    html.Div(id='waddle-small-logo', children=[html.Img(src=app.get_asset_url('icon.png'),
+                     alt='Skype Waddle Logo', className='logo-small')], style={'display': 'none'})
+                     ], style={'padding': '1em 5em 0em 5em'}),
+        # main content
         dbc.Row(id='tagline', children=[
             html.H1(children='Skype Waddle'),
             html.H3(children='Analyze your Skype habits...')
@@ -119,17 +124,16 @@ app.layout = html.Div(children=[
                          style={'display': 'none'}),
         ],style={'display': 'none'}),
         dbc.Row(id='graph-row', style={'display': 'none'}),
-        # dbc.Row(
-            # [html.Div(id='date-time-title', style={'textAlign': 'center'})])
     ],
-                  style={
-                      "height": "90vh",
-                      "position": "relative"
-                  })
+    style={
+        "height": "90vh",
+        "position": "relative"
+    })
 ])
 
 
 @app.callback(Output('waddle-big-logo', 'style'),
+              Output('waddle-small-logo', 'style'),
               Output('tagline', 'style'),
               Output('user-input-step', 'style'),
               Output('data-step', 'style'),
@@ -148,6 +152,7 @@ def render_site_content(uploaded_data, participant_value, participant_confirmed,
 
     out = {
         'waddle-big-logo': show,
+        'waddle-small-logo': hide,
         'tagline': hide,
         'user-input-step': hide,
         'data-step': hide,
@@ -182,6 +187,9 @@ def render_site_content(uploaded_data, participant_value, participant_confirmed,
 
     if graph_figure is not None:
         out['waddle-big-logo'] = hide
+
+    if graph_figure is not None:
+        out['waddle-small-logo'] = show
 
     if graph_figure is not None:
         out['tagline'] = hide
@@ -277,16 +285,16 @@ def on_participant_select(update_progress, n_clicks, participant_options,
             'duration-plot': create.duration_plot(df),
             'weekday-plot': create.weekday_plot(df),
             'calendar-plot': create.calendar_plot(df),
-            'terminator-plot': create.terminator_plot(df, participant_options[participant_value]),
             'caller-plot': create.caller_plot(df, participant_options[participant_value]),
+            'terminator-plot': create.terminator_plot(df, participant_options[participant_value]),
         }
         tabs = dbc.Tabs(
             [
                 dbc.Tab(label="Duration", tab_id="duration-plot", children=plots['duration-plot']),
                 dbc.Tab(label="Weekday", tab_id="weekday-plot", children=plots['weekday-plot']),
                 dbc.Tab(label="Calendar", tab_id="calendar-plot", children=plots['calendar-plot']),
-                dbc.Tab(label="Terminator", tab_id="terminator-plot", children=plots['terminator-plot']),
-                dbc.Tab(label="Caller", tab_id="caller-plot", children=plots['caller-plot']),
+                dbc.Tab(label="Call starter", tab_id="caller-plot", children=plots['caller-plot']),
+                dbc.Tab(label="Call ender", tab_id="terminator-plot", children=plots['terminator-plot']),
             ]
         )
 
@@ -325,4 +333,4 @@ def console_log(children, data):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

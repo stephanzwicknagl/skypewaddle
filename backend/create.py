@@ -74,9 +74,16 @@ def calendar_plot(df):
                   x="ds",
                   y="value",
                   name="Call Duration in Hours",
+                  gap=0,
+                  month_lines_width=3,
+                  month_lines_color="#eeeeff",
                   colorscale="Teal",
                   years_title=True)
-
+    fig.update_layout(
+        paper_bgcolor='rgb(248, 248, 255)',
+        plot_bgcolor='rgb(248, 248, 255)',
+        margin=dict(l=0, r=0, t=0, b=0),
+    )
     tab_content_allyears = dbc.Card(
         dbc.CardBody([
             dcc.Graph(figure=fig),

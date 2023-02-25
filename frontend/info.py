@@ -26,8 +26,8 @@ Here, you can analyze
 
 """
 
-# type: ignore 
 info_content = [
+    # type: ignore 
     html.Div(id="info-open", n_clicks=0, children=[
                 DashIconify(icon="material-symbols:info",
                 height=20,
