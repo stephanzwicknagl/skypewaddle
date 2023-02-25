@@ -1,5 +1,5 @@
 import re
-import ijson
+import ijson.backends.yajl2_c as ijson
 
 import numpy as np
 import pandas as pd
@@ -65,7 +65,7 @@ def get_calls(set_progress, data, partner_index, my_timezone, upload_size):
     ])
     df.set_index('Call ID', inplace=True)
 
-    parser = enumerate(ijson.parse(data))
+    parser = enumerate(ijson.parse(data, use_float=True))
 
     while True:
         prefix, event, value = get_parser_next(set_progress, parser, upload_size)
