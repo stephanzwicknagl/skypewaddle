@@ -300,7 +300,6 @@ def toggle_warn_modal(open_warn, is_open):
 def on_participant_select(update_progress, participant_submitted, plots_storage, participant_options, 
                           participant_value, upload_contents, upload_filename,
                           timezone):
-    print(timezone)
     if timezone is None:
         timezone = {'clientside_timezone': 'UTC'}
     try:
