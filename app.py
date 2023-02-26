@@ -153,11 +153,11 @@ app.layout = html.Div(children=[
               Output('user-input-step', 'style'),
               Output('data-step', 'style'),
               Output('select-participant', 'style'),
-              Output('confirm-select', 'style'), 
+              Output('confirm-select', 'style'),
               Output('progress-bar', 'style'),
               Output('graph-row', 'style'),
               Output('download-step', 'style'),
-              Input('upload-data', 'contents'), 
+              Input('upload-data', 'contents'),
               Input('participant_DD','value'),
               Input('submit-participant', 'n_clicks'),
               Input('graph-row', 'children'),
@@ -297,7 +297,7 @@ def toggle_warn_modal(open_warn, is_open):
     progress=[Output("progress-bar", "value"),
               Output("progress-bar", "max")],
     prevent_initial_call=True)
-def on_participant_select(update_progress, participant_submitted, plots_storage, participant_options, 
+def on_participant_select(update_progress, participant_submitted, plots_storage, participant_options,
                           participant_value, upload_contents, upload_filename,
                           timezone):
     if timezone is None:
@@ -309,7 +309,7 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
 
 
     if ((participant_value is not None and
-        participant_submitted > 0) or 
+        participant_submitted > 0) or
         plots_storage is not None):
         if plots_storage is None:
             conversations = utils.read_conversations_from_file(upload_contents, upload_filename)

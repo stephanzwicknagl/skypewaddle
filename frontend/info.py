@@ -28,7 +28,7 @@ Here, everyone can analyze how much you video chatted with your partner, which w
 disclaimer_text = """
 ### Disclaimer
 
-Your data is processed on the servers of Heroku and is not stored anywhere else. They are only used to generate the graphs and deleted afterwards. The graphs are then stored on your device, so feel free to come back.
+Your data is processed on the servers of Heroku and is not stored anywhere else. It is only used to generate the graphs and deleted when you end your session.
 
 This tool is not affiliated with Microsoft or Skype. It is not endorsed by Microsoft or Skype. It is not sponsored by Microsoft or Skype.
 
