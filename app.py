@@ -7,7 +7,7 @@ import os
 import dash_bootstrap_components as dbc
 from dash import (CeleryManager, Dash, DiskcacheManager, Input, Output, dcc,
                   html)
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, ClientsideFunction
 from dash.exceptions import PreventUpdate
 import plotly.io as pio
 from pytz import UnknownTimeZoneError
@@ -35,6 +35,7 @@ else:
 app = Dash(__name__,
            title="skype waddle",
            update_title="Loading...",
+           external_scripts=['https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js'],
            external_stylesheets=[dbc.themes.LUMEN],
            background_callback_manager=background_callback_manager)
 
@@ -63,13 +64,26 @@ app.clientside_callback(
     Input('data', 'data'),
 )
 
+app.clientside_callback(
+    ClientsideFunction(namespace='clientside', function_name='run_on_participant_select'),
+    Output('dataframe', 'data'),
+    Input('submit-participant', 'n_clicks'),
+    State('participant_DD', 'options'),
+    State('participant_DD', 'value'),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('clientside-timezone', 'data'),
+)
+
 app.layout = html.Div(children=[
     # some local storage
     dcc.Store(id='clientside-timezone', storage_type='memory'),
     dcc.Store(id='data', storage_type='memory'),
     dcc.Store(id='data2', storage_type='memory'),
+    dcc.Store(id='data3', storage_type='memory'),
     dcc.Store(id='open-warn', storage_type='memory'),
     dcc.Store(id='plots', storage_type='local'),
+    dcc.Store(id='dataframe', storage_type='local'),
     # url for relaunching app
     dcc.Location(id='url', refresh=True),
 
@@ -268,65 +282,19 @@ def toggle_warn_modal(open_warn, is_open):
 @app.callback(
     Output('graph-row', 'children'),
     Output('plots', 'data'),
-    Output('open-warn', 'data'),
-    Input('submit-participant', 'n_clicks'),
-    Input('plots', 'data'),
+    Input('dataframe', 'data'),    
     State('participant_DD', 'options'),
     State('participant_DD', 'value'),
-    State('upload-data', 'contents'),
-    State('upload-data', 'filename'),
-    State('clientside-timezone', 'data'),
-    background=True,
-    running=[(
-        Output("progress-bar", "style"),
-        {"visibility": "visible"},
-        {"visibility": "hidden"},
-    ),(
-        Output('progress-row', 'style'),
-        {'display': 'block'},
-        {'display': 'none'},
-    ),(
-        Output('select-participant', 'style'),
-        {'display': 'none'},
-        {'display': 'none'},
-    ),(
-        Output('submit-participant', 'children'),'Analyzing... 🧮 ', 'Start Analyzing! 🧮 ',
-    ),(
-        Output('submit-participant', 'disabled'),True, False
-    )],
-    progress=[Output("progress-bar", "value"),
-              Output("progress-bar", "max")],
     prevent_initial_call=True)
-def on_participant_select(update_progress, participant_submitted, plots_storage, participant_options,
-                          participant_value, upload_contents, upload_filename,
-                          timezone):
-    if timezone is None:
-        timezone = {'clientside_timezone': 'UTC'}
-    try:
-        pytztimezone(timezone['clientside_timezone'])
-    except UnknownTimeZoneError:
-        timezone['clientside_timezone'] = 'UTC'
-
-
-    if ((participant_value is not None and
-        participant_submitted > 0) or
-        plots_storage is not None):
-        if plots_storage is None:
-            conversations = utils.read_conversations_from_file(upload_contents, upload_filename)
-            try:
-                df = extract.get_calls(update_progress, conversations, participant_value,
-                                timezone['clientside_timezone'])
-            except ValueError:
-                return None, None, True
-            plots ={
+def on_participant_select(df,participant_options, participant_value):
+    if df is not None:
+        plots ={
                 'duration-plot': create.duration_plot(df),
                 'weekday-plot': create.weekday_plot(df),
                 'calendar-plot': create.calendar_plot(df),
                 'caller-plot': create.caller_plot(df, participant_options[participant_value]),
                 'terminator-plot': create.terminator_plot(df, participant_options[participant_value]),
             }
-        else:
-            plots = plots_storage
         tabs = dbc.Tabs(
             [
                 dbc.Tab(label="Duration", tab_id="duration-plot", children=utils.make_tab(plots['duration-plot'])),
@@ -337,8 +305,7 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
             ]
         )
 
-        return tabs, plots, False
-
+        return tabs, plots
     raise PreventUpdate
 
 @app.callback(
@@ -454,4 +421,4 @@ def console_log(children, data):
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
