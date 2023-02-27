@@ -313,11 +313,11 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
         plots_storage is not None):
         if plots_storage is None:
             conversations = utils.read_conversations_from_file(upload_contents, upload_filename)
-            # try:
-            df = extract.get_calls(update_progress, conversations, participant_value,
-                                timezone['clientside_timezone'])
-            # except ValueError:
-            #     return None, None, True
+            try:
+                df = extract.get_calls(update_progress, conversations, participant_value,
+                                    timezone['clientside_timezone'])
+            except ValueError:
+                return None, None, True
             plots ={
                 'duration-plot': create.duration_plot(df),
                 'weekday-plot': create.weekday_plot(df),
@@ -464,4 +464,4 @@ def console_log(children, data):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
