@@ -313,11 +313,11 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
         plots_storage is not None):
         if plots_storage is None:
             conversations = utils.read_conversations_from_file(upload_contents, upload_filename)
-            try:
-                df = extract.get_calls(update_progress, conversations, participant_value,
+            # try:
+            df = extract.get_calls(update_progress, conversations, participant_value,
                                 timezone['clientside_timezone'])
-            except ValueError:
-                return None, None, True
+            # except ValueError:
+            #     return None, None, True
             plots ={
                 'duration-plot': create.duration_plot(df),
                 'weekday-plot': create.weekday_plot(df),
@@ -412,6 +412,16 @@ def download_terminator_data(download_click, plots_storage):
     raise PreventUpdate
 
 @app.callback(
+    Output('download-sample-data', 'data'),
+    Input('sample-data-button', 'n_clicks'),
+    prevent_initial_call=True,
+)
+def download_sample_data(download_click):
+    if download_click > 0:
+        return dcc.send_file("./tests/test_data/TestData.tar")
+    raise PreventUpdate
+
+@app.callback(
     Output("url", "href"),
     Output('plots', 'clear_data'),
     Input("waddle-small-logo", "n_clicks"),
@@ -454,4 +464,4 @@ def console_log(children, data):
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)

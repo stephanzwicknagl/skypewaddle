@@ -1,0 +1,520 @@
+{
+  "userId": "8:Ada Lovelace",
+  "exportDate": "2022-05-09T17:16",
+  "conversations": [
+    {
+      "id": "8:Bestie",
+      "displayName": "Bestie",
+      "version": 1651706676506.0,
+      "properties": {
+        "conversationblocked": false,
+        "lastimreceivedtime": "2022-05-04T23:24:34.699Z",
+        "consumptionhorizon": "1651703407506;1651703408569;8908559655145676978",
+        "conversationstatus": "Accepted"
+      },
+      "threadProperties": null,
+      "MessageList": [
+        {
+          "id": "1651706676506",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-04T23:24:34.699Z",
+          "messagetype": "Event/Call",
+          "version": 1651706676506.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"db3ff5cc-f9f5-4fcb-b91f-aaaaaa11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name><duration>16942.904</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>16942.904</duration></part></partlist>",
+          "conversationid": "8:Ada Lovelace",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651689732847",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-04T18:42:11.832Z",
+          "messagetype": "Event/Call",
+          "version": 1651689732847.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"db3ff5cc-f9f5-4fcb-b91f-aaaaaa11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Ada Lovelace",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651667798806",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-04T12:36:38.497Z",
+          "messagetype": "Event/Call",
+          "version": 1651667798806.0,
+          "content": "<partlist type=\"missed\" alt=\"\" callId=\"82bcac93-9056-486e-9d1d-aaaaaa11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Bestie",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651620309862",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-04T02:25:06.971Z",
+          "messagetype": "Event/Call",
+          "version": 1651620309862.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"c123eb76-0908-4211-a54f-aaaaaa11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name><duration>5612.797</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>5612.797</duration></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651614695703",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-03T21:51:34.213Z",
+          "messagetype": "Event/Call",
+          "version": 1651614695703.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"c123eb76-0908-4211-a54f-aaaaaa11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Bestie",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651613881174",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-03T21:37:59.311Z",
+          "messagetype": "Event/Call",
+          "version": 1651613881174.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-aaaaaa11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name><duration>2077.126</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>2077.126</duration></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Bestie",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651611803707",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-03T21:03:22.229Z",
+          "messagetype": "Event/Call",
+          "version": 1651611803707.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-aaaaaa11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Bestie",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651613881174",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-05T23:13:59.311Z",
+          "messagetype": "Event/Call",
+          "version": 1651613881174.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-bbbbbb11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name><duration>2077.126</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>2077.126</duration></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Bestie",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651611803707",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-05T20:03:22.229Z",
+          "messagetype": "Event/Call",
+          "version": 1651611803707.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-bbbbbb11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Bestie",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651613881174",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-07T18:13:59.311Z",
+          "messagetype": "Event/Call",
+          "version": 1651613881174.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-cccccc11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name><duration>2077.126</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>2077.126</duration></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651611803707",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-07T15:53:22.229Z",
+          "messagetype": "Event/Call",
+          "version": 1651611803707.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-cccccc11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Bestie",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651613881174",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-08T20:13:59.311Z",
+          "messagetype": "Event/Call",
+          "version": 1651613881174.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-dddddd11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name><duration>2077.126</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>2077.126</duration></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Bestie",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651611803707",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-08T18:53:22.229Z",
+          "messagetype": "Event/Call",
+          "version": 1651611803707.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-dddddd11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651613881174",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-09T20:13:59.311Z",
+          "messagetype": "Event/Call",
+          "version": 1651613881174.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-eeeeee11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name><duration>2077.126</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>2077.126</duration></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651611803707",
+          "displayName": "Bestie",
+          "originalarrivaltime": "2022-05-09T18:53:22.229Z",
+          "messagetype": "Event/Call",
+          "version": 1651611803707.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-eeeeee11a1a1a\"><part identity=\"live:Bestie\"><name>Bestie</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Bestie",
+          "from": "8:Bestie",
+          "properties": null,
+          "amsreferences": null
+        }
+      ]
+    },
+    {
+      "id": "8:Mom",
+      "displayName": "Mom",
+      "version": 1651706676506.0,
+      "properties": {
+        "conversationblocked": false,
+        "lastimreceivedtime": "2022-05-04T23:24:34.699Z",
+        "consumptionhorizon": "1651703407506;1651703408569;8908559655145676978",
+        "conversationstatus": "Accepted"
+      },
+      "threadProperties": null,
+      "MessageList": [
+        {
+          "id": "1651706676506",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-05-08T23:24:34.699Z",
+          "messagetype": "Event/Call",
+          "version": 1651706676506.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"db3ff5cc-f9f5-4fcb-b91f-aaaaaa11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name><duration>16942.904</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>16942.904</duration></part></partlist>",
+          "conversationid": "8:Ada Lovelace",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651689732847",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-05-08T18:42:11.832Z",
+          "messagetype": "Event/Call",
+          "version": 1651689732847.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"db3ff5cc-f9f5-4fcb-b91f-aaaaaa11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Ada Lovelace",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651667798806",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-05-15T12:36:38.497Z",
+          "messagetype": "Event/Call",
+          "version": 1651667798806.0,
+          "content": "<partlist type=\"missed\" alt=\"\" callId=\"82bcac93-9056-486e-9d1d-aaaaaa11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Mom",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651620309862",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-05-16T02:25:06.971Z",
+          "messagetype": "Event/Call",
+          "version": 1651620309862.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"c123eb76-0908-4211-a54f-aaaaaa11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name><duration>5612.797</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>5612.797</duration></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651614695703",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-05-15T21:51:34.213Z",
+          "messagetype": "Event/Call",
+          "version": 1651614695703.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"c123eb76-0908-4211-a54f-aaaaaa11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Mom",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651613881174",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-05-22T21:37:59.311Z",
+          "messagetype": "Event/Call",
+          "version": 1651613881174.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-aaaaaa11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name><duration>2077.126</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>2077.126</duration></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Mom",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651611803707",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-05-22T21:03:22.229Z",
+          "messagetype": "Event/Call",
+          "version": 1651611803707.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-aaaaaa11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Mom",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651613881174",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-05-29T23:13:59.311Z",
+          "messagetype": "Event/Call",
+          "version": 1651613881174.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-bbbbbb11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name><duration>2077.126</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>2077.126</duration></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Mom",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651611803707",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-05-29T20:03:22.229Z",
+          "messagetype": "Event/Call",
+          "version": 1651611803707.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-bbbbbb11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Mom",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651613881174",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-06-05T18:13:59.311Z",
+          "messagetype": "Event/Call",
+          "version": 1651613881174.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-cccccc11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name><duration>2077.126</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>2077.126</duration></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651611803707",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-06-05T15:53:22.229Z",
+          "messagetype": "Event/Call",
+          "version": 1651611803707.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-cccccc11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Mom",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651613881174",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-06-12T20:13:59.311Z",
+          "messagetype": "Event/Call",
+          "version": 1651613881174.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-dddddd11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name><duration>2077.126</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>2077.126</duration></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Mom",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651611803707",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-06-12T17:53:22.229Z",
+          "messagetype": "Event/Call",
+          "version": 1651611803707.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-dddddd11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651613881174",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-06-19T20:13:59.311Z",
+          "messagetype": "Event/Call",
+          "version": 1651613881174.0,
+          "content": "<partlist type=\"ended\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-eeeeee11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name><duration>2077.126</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>2077.126</duration></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1651611803707",
+          "displayName": "Mom",
+          "originalarrivaltime": "2022-06-19T16:53:22.229Z",
+          "messagetype": "Event/Call",
+          "version": 1651611803707.0,
+          "content": "<partlist type=\"started\" alt=\"\" callId=\"3c759178-371e-4d81-adfe-eeeeee11a1a1a\"><part identity=\"live:Mom\"><name>Mom</name></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "8:Mom",
+          "from": "8:Mom",
+          "properties": null,
+          "amsreferences": null
+        }
+      ]
+    },
+    {
+      "id": "19:b2ecfa1b6b924ae1b3bf2ebbf7680f2d@cast.skype",
+      "displayName": "Ada Lovelace, live:Bestie",
+      "version": 1649796913129.0,
+      "properties": {
+        "conversationblocked": false,
+        "lastimreceivedtime": "2022-04-12T20:55:13.025Z",
+        "consumptionhorizon": null,
+        "conversationstatus": null
+      },
+      "threadProperties": {
+        "membercount": 2,
+        "members": "[\"8:Ada Lovelace\",\"8:Bestie\"]",
+        "topic": "Ada Lovelace, live:Bestie",
+        "picture": null,
+        "description": null,
+        "guidelines": null
+      },
+      "MessageList": [
+        {
+          "id": "1649796913025",
+          "displayName": null,
+          "originalarrivaltime": "2022-04-12T20:55:13.025Z",
+          "messagetype": "ThreadActivity/AddMember",
+          "version": 1649796913025.0,
+          "content": "<addmember><eventtime>1649796913025</eventtime><initiator>8:Bestie</initiator><target>8:Bestie</target><target>8:Ada Lovelace</target></addmember>",
+          "conversationid": "19:b2ecfa1b6b924ae1b3bf2ebbf7680f2d@cast.skype",
+          "from": "19:b2ecfa1b6b924ae1b3bf2ebbf7680f2d@cast.skype",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1649796912728",
+          "displayName": null,
+          "originalarrivaltime": "2022-04-12T20:55:12.728Z",
+          "messagetype": "ThreadActivity/HistoryDisclosedUpdate",
+          "version": 1649796912728.0,
+          "content": "<historydisclosedupdate><eventtime>1649796913025</eventtime><initiator>8:Bestie</initiator><value>True</value></historydisclosedupdate>",
+          "conversationid": "19:b2ecfa1b6b924ae1b3bf2ebbf7680f2d@cast.skype",
+          "from": "19:b2ecfa1b6b924ae1b3bf2ebbf7680f2d@cast.skype",
+          "properties": null,
+          "amsreferences": null
+        }
+      ]
+    },
+    {
+      "id": "19:fe22765a50f048feb4da74b22e0c9847@thread.skype",
+      "displayName": "CCC, Ada Lovelace, live:Bestie",
+      "version": 1642367573545.0,
+      "properties": {
+        "conversationblocked": false,
+        "lastimreceivedtime": "2022-01-16T20:39:12.421Z",
+        "consumptionhorizon": null,
+        "conversationstatus": null
+      },
+      "threadProperties": {
+        "membercount": 3,
+        "members": "[\"8:CCC\",\"8:Ada Lovelace\",\"8:Bestie\"]",
+        "topic": "CCC, Ada Lovelace, live:Bestie",
+        "picture": null,
+        "description": null,
+        "guidelines": null
+      },
+      "MessageList": [
+        {
+          "id": "1642367417153",
+          "displayName": null,
+          "originalarrivaltime": "2022-01-16T21:10:16.595Z",
+          "messagetype": "Event/Call",
+          "version": 1642367417153.0,
+          "content": "<partlist type=\"ended\" alt=\"\"><part identity=\"CCC\"><name>CCC</name><duration>1863</duration></part><part identity=\"live:Bestie\"><name>live:Bestie</name><duration>1863</duration></part><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name><duration>1863</duration></part></partlist>",
+          "conversationid": "19:fe22765a50f048feb4da74b22e0c9847@thread.skype",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1642365553999",
+          "displayName": null,
+          "originalarrivaltime": "2022-01-16T20:39:12.777Z",
+          "messagetype": "Event/Call",
+          "version": 1642365553999.0,
+          "content": "<partlist type=\"started\" alt=\"\"><part identity=\"Ada Lovelace\"><name>Ada Lovelace</name></part></partlist>",
+          "conversationid": "19:fe22765a50f048feb4da74b22e0c9847@thread.skype",
+          "from": "8:Ada Lovelace",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1642365552421",
+          "displayName": null,
+          "originalarrivaltime": "2022-01-16T20:39:12.421Z",
+          "messagetype": "ThreadActivity/JoiningEnabledUpdate",
+          "version": 1642365552421.0,
+          "content": "<joiningenabledupdate><eventtime>1642365552530</eventtime><initiator>8:Ada Lovelace</initiator><value>true</value></joiningenabledupdate>",
+          "conversationid": "19:fe22765a50f048feb4da74b22e0c9847@thread.skype",
+          "from": "19:fe22765a50f048feb4da74b22e0c9847@thread.skype",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1642365552280",
+          "displayName": null,
+          "originalarrivaltime": "2022-01-16T20:39:12.28Z",
+          "messagetype": "ThreadActivity/AddMember",
+          "version": 1642365552280.0,
+          "content": "<addmember><eventtime>1642365552280</eventtime><initiator>8:Ada Lovelace</initiator><target>8:Bestie</target><target>8:CCC</target><target>8:Ada Lovelace</target></addmember>",
+          "conversationid": "19:fe22765a50f048feb4da74b22e0c9847@thread.skype",
+          "from": "19:fe22765a50f048feb4da74b22e0c9847@thread.skype",
+          "properties": null,
+          "amsreferences": null
+        },
+        {
+          "id": "1642365551843",
+          "displayName": null,
+          "originalarrivaltime": "2022-01-16T20:39:11.843Z",
+          "messagetype": "ThreadActivity/HistoryDisclosedUpdate",
+          "version": 1642365551843.0,
+          "content": "<historydisclosedupdate><eventtime>1642365551952</eventtime><initiator>8:Ada Lovelace</initiator><value>true</value></historydisclosedupdate>",
+          "conversationid": "19:fe22765a50f048feb4da74b22e0c9847@thread.skype",
+          "from": "19:fe22765a50f048feb4da74b22e0c9847@thread.skype",
+          "properties": null,
+          "amsreferences": null
+        }
+      ]
+    }
+  ]
+}

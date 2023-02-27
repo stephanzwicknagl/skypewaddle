@@ -11,6 +11,8 @@ manual_text = """
 - 😀 Enjoy and share!
 
 - 🕐 Some of the results depend on the time zone of your device. If you live in different time zonees, have your partner try it on their end to see their results.
+
+Want to use some sample data first?
 """
 
 story_text = """
@@ -45,8 +47,12 @@ info_content = [
     dbc.Modal(id="info-modal", is_open=False, children=[
             dbc.ModalHeader(dbc.ModalTitle(["How To Use ", html.Em("Skype Waddle")])),
                 dbc.ModalBody(children=[
-                    dcc.Markdown([manual_text, story_text, disclaimer_text],
-                        link_target="_blank")
+                    dcc.Markdown([manual_text],
+                        link_target="_blank"),
+                    dbc.Button("Download sample data", id="sample-data-button", n_clicks=0, className="button", style={"marginBottom": "1rem"}),
+                    dcc.Download(id="download-sample-data"),
+                    dcc.Markdown([story_text, disclaimer_text],
+                        link_target="_blank"),
                 ]),
                 dbc.ModalFooter(
                     dbc.Button(
