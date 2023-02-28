@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly_calplot import calplot
 
+LOGO_URL = "https://raw.githubusercontent.com/stephanzwicknagl/skypewaddle/d29015c1bd3f859d5bcd4fd0f774553703aa65e1/assets/icon-192x192.png"
 
 def weekday_plot(df: pd.DataFrame) -> go.Figure:
     week = pd.DataFrame(
@@ -43,6 +44,15 @@ def weekday_plot(df: pd.DataFrame) -> go.Figure:
                       plot_bgcolor='rgb(248, 248, 255)',
                       title=f"Your favorite skype-day is {week.loc[:,'Duration'].idxmax()}")
     fig.update_xaxes(title_text=f"{unit} skyped", title_font={"size": 14})
+    fig.add_layout_image(
+        dict(
+            source=LOGO_URL,
+            xref="paper", yref="paper",
+            x=1, y=1.05,
+            sizex=0.2, sizey=0.2,
+            xanchor="right", yanchor="bottom"
+        )
+    )
 
     return fig
 
@@ -73,6 +83,15 @@ def calendar_plot(df: pd.DataFrame) -> go.Figure:
         plot_bgcolor='rgb(248, 248, 255)',
         margin=dict(l=0, r=0, t=0, b=0),
     )
+    fig.add_layout_image(
+        dict(
+            source=LOGO_URL,
+            xref="paper", yref="paper",
+            x=1, y=1.05,
+            sizex=0.2, sizey=0.2,
+            xanchor="right", yanchor="bottom"
+        )
+    )
 
     return fig
 
@@ -92,29 +111,29 @@ def duration_plot(df: pd.DataFrame) -> go.Figure:
                          'x': [0, 1],
                          'y': [0.4, 1]
                      }))
-    if sum > 100 and unit == "hours":
-        fig.add_trace(
-            go.Indicator(mode="number",
-                         value=round(sum / 24, 2),
-                         number={"suffix": " days!"},
-                         title={"text": "That's equal to"},
-                         domain={
-                             'x': [0, 1],
-                             'y': [0.1, 0.3]
-                         }))
-    if sum < 100 and unit == "hours":
-        fig.add_trace(
-            go.Indicator(mode="number",
-                         value=round(sum / 1.5, 2),
-                         number={"suffix": " Shreks!"},
-                         title={"text": "That's equal to"},
-                         domain={
-                             'x': [0, 1],
-                             'y': [0.1, 0.3]
-                         }))
+    fig.add_trace(
+        go.Indicator(mode="number",
+                     value=len(df.index.unique()),
+                     number={"suffix": f" calls! 📞"},
+                     title={"text": "Over"},
+                     domain={
+                         'x': [0, 1],
+                         'y': [0.1, 0.3]
+                     }))
+
     fig.update_layout(paper_bgcolor='rgb(248, 248, 255)',
                       plot_bgcolor='rgb(248, 248, 255)')
-
+    fig.add_layout_image(
+        dict(
+            source=LOGO_URL,
+            xref="paper",
+            yref="paper",
+            x=1,
+            y=1.05,
+            sizex=0.2,
+            sizey=0.2,
+            xanchor="right",
+            yanchor="bottom"))
     return fig
 
 
@@ -136,7 +155,7 @@ def terminator_plot(df: pd.DataFrame, participant: Dict[str, str])  -> go.Figure
                           'text': "The person who's most likely to hang up...",
                           'y': 0.95,
                           'x': 0.5,
-                          
+
                       })
     if participant is not None:
         text_str = "is your friend." if counts.idxmax() == participant['label'] else "is you."
@@ -147,7 +166,15 @@ def terminator_plot(df: pd.DataFrame, participant: Dict[str, str])  -> go.Figure
                        showarrow=True,
                        arrowsize=3,
                        arrowhead=1)
-
+    fig.add_layout_image(
+        dict(
+            source=LOGO_URL,
+            xref="paper", yref="paper",
+            x=1, y=1.05,
+            sizex=0.2, sizey=0.2,
+            xanchor="right", yanchor="bottom"
+        )
+    )
     return fig
 
 
@@ -179,5 +206,13 @@ def caller_plot(df: pd.DataFrame, participant: Dict[str, str]) -> go.Figure:
                        showarrow=True,
                        arrowsize=3,
                        arrowhead=1)
-        
+    fig.add_layout_image(
+        dict(
+            source=LOGO_URL,
+            xref="paper", yref="paper",
+            x=1, y=1.05,
+            sizex=0.2, sizey=0.2,
+            xanchor="right", yanchor="bottom"
+        )
+    )
     return fig
