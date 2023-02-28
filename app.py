@@ -70,6 +70,7 @@ app.layout = html.Div(children=[
     dcc.Store(id='data2', storage_type='memory'),
     dcc.Store(id='open-warn', storage_type='memory'),
     dcc.Store(id='plots', storage_type='local'),
+    dcc.Download(id='download-csv'),
     # url for relaunching app
     dcc.Location(id='url', refresh=True),
 
@@ -269,6 +270,7 @@ def toggle_warn_modal(open_warn, is_open):
     Output('graph-row', 'children'),
     Output('plots', 'data'),
     Output('open-warn', 'data'),
+    Output('download-csv', 'data'),
     Input('submit-participant', 'n_clicks'),
     Input('plots', 'data'),
     State('participant_DD', 'options'),
@@ -312,12 +314,12 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
         participant_submitted > 0) or
         plots_storage is not None):
         if plots_storage is None:
-            conversations = utils.read_conversations_from_file(upload_contents, upload_filename)
             try:
+                conversations = utils.read_conversations_from_file(upload_contents, upload_filename)
                 df = extract.get_calls(update_progress, conversations, participant_value,
                                     timezone['clientside_timezone'])
             except ValueError:
-                return None, None, True
+                return None, None, True, None
             plots ={
                 'duration-plot': create.duration_plot(df),
                 'weekday-plot': create.weekday_plot(df),
@@ -337,7 +339,7 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
             ]
         )
 
-        return tabs, plots, False
+        return tabs, plots, False, dcc.send_data_frame(df.to_csv, "mywaddle.csv")
 
     raise PreventUpdate
 
@@ -351,7 +353,7 @@ def download_duration_data(download_click, plots_storage):
     if download_click > 0:
         fig = pio.from_json(json.dumps(plots_storage['duration-plot']))
         img_bytes = fig.to_image(format="png", scale=10)
-        img_name = "waddle-duration.png"
+        img_name = "mywaddle-duration.png"
         return dcc.send_bytes(img_bytes, img_name)
     raise PreventUpdate
 
@@ -365,7 +367,7 @@ def download_weekday_data(download_click, plots_storage):
     if download_click > 0:
         fig = pio.from_json(json.dumps(plots_storage['weekday-plot']))
         img_bytes = fig.to_image(format="png", scale=10)
-        img_name = "waddle-weekday.png"
+        img_name = "mywaddle-weekdays.png"
         return dcc.send_bytes(img_bytes, img_name)
     raise PreventUpdate
 
@@ -379,7 +381,7 @@ def download_calendar_data(download_click, plots_storage):
     if download_click > 0:
         fig = pio.from_json(json.dumps(plots_storage['calendar-plot']))
         img_bytes = fig.to_image(format="png", scale=10)
-        img_name = "waddle-year.png"
+        img_name = "mywaddle-year.png"
         return dcc.send_bytes(img_bytes, img_name)
     raise PreventUpdate
 
@@ -393,7 +395,7 @@ def download_caller_data(download_click, plots_storage):
     if download_click > 0:
         fig = pio.from_json(json.dumps(plots_storage['caller-plot']))
         img_bytes = fig.to_image(format="png", scale=10)
-        img_name = "waddle-caller.png"
+        img_name = "mywaddle-caller.png"
         return dcc.send_bytes(img_bytes, img_name)
     raise PreventUpdate
 
@@ -407,7 +409,7 @@ def download_terminator_data(download_click, plots_storage):
     if download_click > 0:
         fig = pio.from_json(json.dumps(plots_storage['terminator-plot']))
         img_bytes = fig.to_image(format="png", scale=10)
-        img_name = "waddle-callender.png"
+        img_name = "mywaddle-callender.png"
         return dcc.send_bytes(img_bytes, img_name)
     raise PreventUpdate
 
@@ -464,4 +466,4 @@ def console_log(children, data):
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
