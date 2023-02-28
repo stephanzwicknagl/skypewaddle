@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
-import pytz
+import lxml.etree as ET
 
 
 def extract_conversations(conversations):
@@ -59,8 +59,8 @@ def get_calls(set_progress, conversations, partner_index, my_timezone):
         # extract call data
         try:
             calls = get_times(obj, my_timezone)
-        except IndexError:
-            raise ValueError
+        except KeyError:
+            raise ValueError("The json file is malformed.")
         # missed calls are ignored
         # if call is missed/etc. calls is empty
         if calls is None:
@@ -111,30 +111,9 @@ def fix_old_ids(df):
 
 
 def is_call(obj):
-    if (extract_values(obj, "messagetype") == ['Event/Call']):
+    if obj['messagetype'] == 'Event/Call':
         return True
     return False
-
-
-def extract_values(obj, key):
-    """Pull all values of specified key from nested JSON."""
-    arr = []
-
-    def extract(obj, arr, key):
-        """Recursively search for values of key in JSON tree."""
-        if isinstance(obj, dict):
-            for k, v in obj.items():
-                if isinstance(v, (dict, list)):
-                    extract(v, arr, key)
-                elif k == key:
-                    arr.append(v)
-        elif isinstance(obj, list):
-            for item in obj:
-                extract(item, arr, key)
-        return arr
-
-    results = extract(obj, arr, key)
-    return results
 
 
 def get_times(obj, my_timezone):
@@ -148,18 +127,18 @@ def get_times(obj, my_timezone):
         pd.DataFrame -- dataframe with call data
                         [ID, Start Time, End Time, Duration, Weekday, Caller Terminator]
     """
+    content = ET.fromstring(obj['content'], parser=ET.XMLParser(encoding='utf-8'))
 
-    content = (extract_values(obj, 'content'))[0]
     # get datetime of event
     time = get_call_time(obj, my_timezone)
     # get caller/terminator of call
-    val_from = extract_values(obj, 'from')[0]
+    val_from = obj['from']
     # unique identifier for each call to match start and end later
-    call_id = re.findall('callId=\\"(\\S+)\\"', content)[0]
+    call_id = content.get('callId')
     # secondary id identifier for calls before mid 2019(?)
-    id_sec = extract_values(obj, 'id')[0]
+    id_sec = obj['id']
 
-    event_category = re.findall('type=\\"(\\S+)\\"', content)[0]
+    event_category = content.get('type')
     if event_category == 'started':
         calls = pd.DataFrame(data={
             'Call ID': call_id,
@@ -171,7 +150,7 @@ def get_times(obj, my_timezone):
         },
                                 index=['Call ID'])
     elif event_category == 'ended':
-        duration = re.findall('<duration>([0-9.]+)</duration>', content)
+        duration = content.xpath('.//part[1]/duration/text()')
         if len(duration) != 0:
             duration = float(duration[0])
         else:
@@ -192,7 +171,7 @@ def get_times(obj, my_timezone):
 
 
 def get_call_time(obj, my_timezone):
-    time = (extract_values(obj, 'originalarrivaltime'))[0]
+    time = obj['originalarrivaltime']
     year = int(time[0:4])
     month = int(time[5:7])
     day = int(time[8:10])
@@ -224,37 +203,31 @@ def assign_date_for_midnight(df, my_timezone):
 
     for index, row in df.iterrows():
         if row['Start Time'].date() != row['End Time'].date():
-            date_2 = row['End Time'].date()
-            try:
-                starttime_2 = datetime.datetime(
-                    year=date_2.year,
-                    month=date_2.month,
-                    day=date_2.day,
-                    hour=0,
-                    minute=0,
-                    second=0,
-                    tzinfo=ZoneInfo(my_timezone)
-                )
-            except TypeError:
+            if pd.isnull(row['Start Time']) or pd.isnull(row['End Time']):
                 continue
+            date_2 = row['End Time'].date()
+            starttime_2 = datetime.datetime(
+                year=date_2.year,
+                month=date_2.month,
+                day=date_2.day,
+                hour=0,
+                minute=0,
+                second=0,
+                tzinfo=ZoneInfo(my_timezone))
             endtime_2 = row['End Time']
             duration_2 = float((endtime_2 - starttime_2).seconds)
             terminator_2 = row['Terminator']
 
             starttime_1 = row['Start Time']
             date_1 = row['Start Time'].date()
-            try:
-                endtime_1 = datetime.datetime(
-                    year=date_1.year,
-                    month=date_1.month,
-                    day=date_1.day,
-                    hour=23,
-                    minute=59,
-                    second=59,
-                    tzinfo=ZoneInfo(my_timezone)
-                )
-            except TypeError:
-                continue
+            endtime_1 = datetime.datetime(
+                year=date_1.year,
+                month=date_1.month,
+                day=date_1.day,
+                hour=23,
+                minute=59,
+                second=59,
+                tzinfo=ZoneInfo(my_timezone))
             duration_1 = float((endtime_1 - starttime_1).seconds)
             caller_1 = row['Caller']
 
