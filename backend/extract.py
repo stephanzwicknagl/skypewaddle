@@ -1,10 +1,6 @@
-import re
-
-import numpy as np
-import pandas as pd
-
 import datetime
 import re
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
@@ -165,36 +161,30 @@ def get_times(obj, my_timezone):
 
     event_category = re.findall('type=\\"(\\S+)\\"', content)[0]
     if event_category == 'started':
-        try:
-            calls = pd.DataFrame(data={
-                'Call ID': call_id,
-                'ID': id_sec,
-                'Start Time': time,
-                'End Time': np.nan,
-                'Caller': val_from,
-                'Weekday': time.weekday(),
-            },
-                                 index=['Call ID'])
-        except pytz.exceptions.AmbiguousTimeError:
-            return None
+        calls = pd.DataFrame(data={
+            'Call ID': call_id,
+            'ID': id_sec,
+            'Start Time': time,
+            'End Time': np.nan,
+            'Caller': val_from,
+            'Weekday': time.weekday(),
+        },
+                                index=['Call ID'])
     elif event_category == 'ended':
         duration = re.findall('<duration>([0-9.]+)</duration>', content)
         if len(duration) != 0:
             duration = float(duration[0])
         else:
             duration = 0
-        try:
-            calls = pd.DataFrame(data={
-                'Call ID': call_id,
-                'ID': id_sec,
-                'Start Time': np.nan,
-                'End Time': time,
-                'Duration': duration,
-                'Terminator': val_from
-            },
-                                 index=['Call ID'])
-        except pytz.exceptions.AmbiguousTimeError:
-            return None
+        calls = pd.DataFrame(data={
+            'Call ID': call_id,
+            'ID': id_sec,
+            'Start Time': np.nan,
+            'End Time': time,
+            'Duration': duration,
+            'Terminator': val_from
+        },
+                                index=['Call ID'])
     else:
         return
     calls.set_index('Call ID', inplace=True)
@@ -216,8 +206,8 @@ def get_call_time(obj, my_timezone):
                                hour,
                                minute,
                                second,
-                               tzinfo=datetime.timezone.utc).astimezone(
-                                   pytz.timezone(my_timezone))
+                               tzinfo=ZoneInfo('utc')).astimezone(
+                                   ZoneInfo(my_timezone))
     return moment
 
 
@@ -243,7 +233,8 @@ def assign_date_for_midnight(df, my_timezone):
                     hour=0,
                     minute=0,
                     second=0,
-                ).astimezone(pytz.timezone(my_timezone))
+                    tzinfo=ZoneInfo(my_timezone)
+                )
             except TypeError:
                 continue
             endtime_2 = row['End Time']
@@ -260,7 +251,8 @@ def assign_date_for_midnight(df, my_timezone):
                     hour=23,
                     minute=59,
                     second=59,
-                ).astimezone(pytz.timezone(my_timezone))
+                    tzinfo=ZoneInfo(my_timezone)
+                )
             except TypeError:
                 continue
             duration_1 = float((endtime_1 - starttime_1).seconds)
