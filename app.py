@@ -10,8 +10,7 @@ from dash import (CeleryManager, Dash, DiskcacheManager, Input, Output, dcc,
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 import plotly.io as pio
-from pytz import UnknownTimeZoneError
-from pytz import timezone as pytztimezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from backend import create, extract, utils
 from frontend.download import download_content
@@ -70,7 +69,6 @@ app.layout = html.Div(children=[
     dcc.Store(id='data2', storage_type='memory'),
     dcc.Store(id='open-warn', storage_type='memory'),
     dcc.Store(id='plots', storage_type='local'),
-    dcc.Download(id='download-csv'),
     # url for relaunching app
     dcc.Location(id='url', refresh=True),
 
@@ -270,7 +268,6 @@ def toggle_warn_modal(open_warn, is_open):
     Output('graph-row', 'children'),
     Output('plots', 'data'),
     Output('open-warn', 'data'),
-    Output('download-csv', 'data'),
     Input('submit-participant', 'n_clicks'),
     Input('plots', 'data'),
     State('participant_DD', 'options'),
@@ -305,8 +302,8 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
     if timezone is None:
         timezone = {'clientside_timezone': 'UTC'}
     try:
-        pytztimezone(timezone['clientside_timezone'])
-    except UnknownTimeZoneError:
+        ZoneInfo(timezone['clientside_timezone'])
+    except ZoneInfoNotFoundError:
         timezone['clientside_timezone'] = 'UTC'
 
 
@@ -319,7 +316,7 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
                 df = extract.get_calls(update_progress, conversations, participant_value,
                                     timezone['clientside_timezone'])
             except ValueError:
-                return None, None, True, None
+                return None, None, True
             plots ={
                 'duration-plot': create.duration_plot(df),
                 'weekday-plot': create.weekday_plot(df),
@@ -339,7 +336,7 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
             ]
         )
 
-        return tabs, plots, False, dcc.send_data_frame(df.to_csv, "mywaddle.csv")
+        return tabs, plots, False
 
     raise PreventUpdate
 
@@ -466,4 +463,4 @@ def console_log(children, data):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
