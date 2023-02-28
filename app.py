@@ -68,6 +68,7 @@ app.layout = html.Div(children=[
     dcc.Store(id='data2', storage_type='memory'),
     dcc.Store(id='open-warn', storage_type='memory'),
     dcc.Store(id='plots', storage_type='local'),
+    dcc.Store(id='participant_userid', storage_type='memory'),
     # url for relaunching app
     dcc.Location(id='url', refresh=True),
 
@@ -227,6 +228,7 @@ def render_site_content(uploaded_data, participant_value, participant_confirmed,
 
 
 @app.callback(Output('participant_DD', 'options'),
+              Output('participant_userid', 'data'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'))
 def on_upload(contents, filename):
@@ -234,10 +236,10 @@ def on_upload(contents, filename):
         conversations = utils.read_conversations_from_file(contents, filename)
         participants = extract.extract_conversations(conversations)
         options = [{
-            'label': p,
+            'label': p['label'],
             'value': idx
         } for idx, p in enumerate(participants)]
-        return options
+        return options, participants
     raise PreventUpdate
 
 
@@ -271,8 +273,8 @@ def toggle_warn_modal(open_warn, is_open):
     Output('submit-participant', 'children'),
     Input('submit-participant', 'n_clicks'),
     Input('plots', 'data'),
-    State('participant_DD', 'options'),
     State('participant_DD', 'value'),
+    State('participant_userid', 'data'),
     State('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('clientside-timezone', 'data'),
@@ -297,8 +299,8 @@ def toggle_warn_modal(open_warn, is_open):
     progress=[Output("progress-bar", "value"),
               Output("progress-bar", "max")],
     prevent_initial_call=True)
-def on_participant_select(update_progress, participant_submitted, plots_storage, participant_options,
-                          participant_value, upload_contents, upload_filename,
+def on_participant_select(update_progress, participant_submitted, plots_storage,
+                          participant_value, participant_userid, upload_contents, upload_filename,
                           timezone):
     if timezone is None:
         timezone = {'clientside_timezone': 'UTC'}
@@ -311,6 +313,7 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
     if ((participant_value is not None and
         participant_submitted > 0) or
         plots_storage is not None):
+        participant = participant_userid[participant_value]
         if plots_storage is None:
             try:
                 conversations = utils.read_conversations_from_file(upload_contents, upload_filename)
@@ -322,8 +325,8 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
                 'duration-plot': create.duration_plot(df),
                 'weekday-plot': create.weekday_plot(df),
                 'calendar-plot': create.calendar_plot(df),
-                'caller-plot': create.caller_plot(df, participant_options[participant_value]),
-                'terminator-plot': create.terminator_plot(df, participant_options[participant_value]),
+                'caller-plot': create.caller_plot(df, participant),
+                'terminator-plot': create.terminator_plot(df, participant),
             }
         else:
             plots = plots_storage

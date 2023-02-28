@@ -158,7 +158,7 @@ def terminator_plot(df: pd.DataFrame, participant: Dict[str, str])  -> go.Figure
 
                       })
     if participant is not None:
-        text_str = "is your friend." if counts.idxmax() == participant['label'] else "is you."
+        text_str = "is your friend." if counts.idxmax() == participant['username'] else "is you."
         fig.add_annotation(
                        x=counts.argmax(),
                        y=counts.max()/counts.sum(),
@@ -199,7 +199,7 @@ def caller_plot(df: pd.DataFrame, participant: Dict[str, str]) -> go.Figure:
                           'x': 0.5,
                       })
     if participant is not None:
-        text_str = "is your friend." if counts.idxmax() == participant['label'] else "is you."
+        text_str = "is your friend." if counts.idxmax() == participant['username'] else "is you."
         fig.add_annotation(x=counts.argmax(),
                        y=counts.max()/counts.sum(),
                        text=text_str,

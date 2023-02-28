@@ -19,14 +19,14 @@ def extract_conversations(conversations):
         indexes -- index of the chosen partner or if test a dictionary with all conversation partner as key and their index as value
     """
 
-    idxs = {}
+    participants = []
     for i in range(0, len(conversations)):
-        partner = conversations[i]['id']
-        if not partner.endswith('.skype'):
-            if partner.startswith('8:'):
-                partner = conversations[i]['displayName'] if conversations[i]['displayName'] is not None else partner
-            idxs[partner] = i
-    return idxs
+        userid = conversations[i]['id']
+        if not userid.endswith('.skype'):
+            partner = conversations[i]['displayName'] if conversations[i]['displayName'] \
+                is not None and userid.startswith('8:') else userid
+            participants.append({'label': partner, 'username': userid})
+    return participants
 
 
 def get_calls(set_progress, conversations, partner_index, my_timezone):

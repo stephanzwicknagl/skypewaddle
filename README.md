@@ -18,6 +18,7 @@ This app is currently hosted at [https://skypewaddle.herokuapp.com/](https://sky
   - and more...
 - Results change dynamically depending on your timezone
 - An info page describing how to use the app and the story of how it came about
+- Download your results to share with your friends
 
 Tools used:
 
