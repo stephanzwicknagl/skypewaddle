@@ -24,7 +24,7 @@ During the pandemic, we would talk for hours and hours.
 
 We started to wonder how much we actually skyped. That's why I created this tool.
 
-Here, everyone can analyze how much you video chatted with your partner, which weekdays you skyped the most, the duration of your calls over time and more.
+Here, you can analyze how much you video chat with your partner, friends or family. Find out how many hours, how many calls, the duration of your calls over time and more.
 """
 
 disclaimer_text = """
@@ -40,7 +40,7 @@ info_content = [
     # type: ignore 
     html.Div(id="info-open", n_clicks=0, children=[
                 DashIconify(icon="material-symbols:info",
-                height=20,
+                height=25,
                 className="info",
                 style={"color": "#00aff0"})
             ]),

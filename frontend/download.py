@@ -1,15 +1,16 @@
-from dash import html, dcc
+import dash_bootstrap_components as dbc
+from dash import dcc, html
 from dash_iconify import DashIconify
 
 download_content=[
             html.Div(
-                html.Button(
+                dbc.Button(
                     id='download-button',
                     children=[
                         'Download your plots  ', 
                         DashIconify(icon="ic:baseline-download-for-offline", 
                                     height=20,
-                                    style={'color': '#42bff5'})],
+                                    style={'color': '#f8f8ff'})],
                     className='button', 
                     n_clicks=0)),
             dcc.Download(id="download-duration-plot"),

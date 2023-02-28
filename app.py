@@ -34,7 +34,7 @@ else:
 app = Dash(__name__,
            title="skype waddle",
            update_title="Loading...",
-           external_stylesheets=[dbc.themes.LUMEN],
+           external_stylesheets=[dbc.themes.ZEPHYR],
            background_callback_manager=background_callback_manager)
 
 server = app.server
@@ -92,7 +92,7 @@ app.layout = html.Div(children=[
         # main content
         dbc.Row(id='tagline', children=[
             html.H1(children='Skype Waddle'),
-            html.H3(children='Analyze your Skype habits...')
+            html.H3(children=html.Em('Analyze your Skype habits...'))
         ]),
         dbc.Row(id='user-input-step', children=[
             html.Div(
@@ -119,7 +119,7 @@ app.layout = html.Div(children=[
             html.Div(
                 id='confirm-select',
                 children=[
-                    html.Button(
+                    dbc.Button(
                         id='submit-participant',
                         children='Start Analyzing! 🧮',
                         n_clicks=0,
@@ -268,6 +268,8 @@ def toggle_warn_modal(open_warn, is_open):
     Output('graph-row', 'children'),
     Output('plots', 'data'),
     Output('open-warn', 'data'),
+    Output('submit-participant', 'disabled'),
+    Output('submit-participant', 'children'),
     Input('submit-participant', 'n_clicks'),
     Input('plots', 'data'),
     State('participant_DD', 'options'),
@@ -316,7 +318,7 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
                 df = extract.get_calls(update_progress, conversations, participant_value,
                                     timezone['clientside_timezone'])
             except ValueError:
-                return None, None, True
+                return None, None, True, True, 'Generating plots... 📈'
             plots ={
                 'duration-plot': create.duration_plot(df),
                 'weekday-plot': create.weekday_plot(df),
@@ -336,7 +338,7 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
             ]
         )
 
-        return tabs, plots, False
+        return tabs, plots, False, True, 'Generating plots... 📈'
 
     raise PreventUpdate
 
