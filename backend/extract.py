@@ -1,5 +1,4 @@
 import datetime
-import re
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -23,7 +22,9 @@ def extract_conversations(conversations):
     idxs = {}
     for i in range(0, len(conversations)):
         partner = conversations[i]['id']
-        if re.search('.skype', partner) is None:
+        if not partner.endswith('.skype'):
+            if partner.startswith('8:'):
+                partner = conversations[i]['displayName'] if conversations[i]['displayName'] is not None else partner
             idxs[partner] = i
     return idxs
 
