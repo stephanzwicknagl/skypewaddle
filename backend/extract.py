@@ -234,7 +234,6 @@ def assign_date_for_midnight(df, my_timezone):
 
     for index, row in df.iterrows():
         if row['Start Time'].date() != row['End Time'].date():
-            callid_2 = index + '_2'
             date_2 = row['End Time'].date()
             try:
                 starttime_2 = datetime.datetime(
@@ -245,13 +244,12 @@ def assign_date_for_midnight(df, my_timezone):
                     minute=0,
                     second=0,
                 ).astimezone(pytz.timezone(my_timezone))
-            except:
+            except TypeError:
                 continue
             endtime_2 = row['End Time']
             duration_2 = float((endtime_2 - starttime_2).seconds)
             terminator_2 = row['Terminator']
 
-            callid_1 = index + '_1'
             starttime_1 = row['Start Time']
             date_1 = row['Start Time'].date()
             try:
@@ -263,13 +261,13 @@ def assign_date_for_midnight(df, my_timezone):
                     minute=59,
                     second=59,
                 ).astimezone(pytz.timezone(my_timezone))
-            except:
+            except TypeError:
                 continue
             duration_1 = float((endtime_1 - starttime_1).seconds)
             caller_1 = row['Caller']
 
             call = pd.DataFrame(data={
-                'Call ID': [callid_1, callid_2],
+                'Call ID': [index, index],
                 'Start Time': [starttime_1, starttime_2],
                 'End Time': [endtime_1, endtime_2],
                 'Caller': [caller_1, np.nan],
@@ -278,7 +276,7 @@ def assign_date_for_midnight(df, my_timezone):
                 'Weekday': [starttime_1.weekday(),
                             starttime_2.weekday()],
             },
-                                index=[callid_1, callid_2])
+                                index=[index, index])
             call.set_index('Call ID', inplace=True)
 
             df = df.drop(index)
