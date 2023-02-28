@@ -1,16 +1,15 @@
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
 
-import orjson
 import os
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import dash_bootstrap_components as dbc
-from dash import (CeleryManager, Dash, DiskcacheManager, Input, Output, dcc,
-                  html)
+import orjson
+import plotly.io as pio
+from dash import CeleryManager, Dash, DiskcacheManager, dcc, html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-import plotly.io as pio
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from backend import create, extract, utils
 from frontend.download import download_content
