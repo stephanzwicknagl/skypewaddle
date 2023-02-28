@@ -180,13 +180,13 @@ def get_call_time(obj, my_timezone):
     second = int(time[17:19])
 
     moment = datetime.datetime(year,
-                               month,
-                               day,
-                               hour,
-                               minute,
-                               second,
-                               tzinfo=ZoneInfo('utc')).astimezone(
-                                   ZoneInfo(my_timezone))
+                            month,
+                            day,
+                            hour,
+                            minute,
+                            second,
+                            tzinfo=ZoneInfo('Etc/UTC')).astimezone(
+                                ZoneInfo(my_timezone))
     return moment
 
 
