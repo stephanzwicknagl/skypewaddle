@@ -39,7 +39,7 @@ app = Dash(__name__,
 
 server = app.server
 cache = Cache(server, config={
-    'CACHE_TYPE': 'reids',
+    'CACHE_TYPE': 'redis',
     'CACHE_REDIS_URL': os.environ.get('REDIS_URL', '')
     # 'CACHE_TYPE': 'FileSystemCache',
     # 'CACHE_DIR': 'cache-directory',
