@@ -353,7 +353,7 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
 def download_duration_data(download_click, plots_storage):
     if download_click > 0:
         fig = pio.from_json(orjson.dumps(plots_storage['duration-plot']))
-        img_bytes = fig.to_image(format="png", scale=10)
+        img_bytes = fig.to_image(format="png", scale=10, width=700)
         img_name = "mywaddle-duration.png"
         return dcc.send_bytes(img_bytes, img_name)
     raise PreventUpdate
@@ -367,7 +367,7 @@ def download_duration_data(download_click, plots_storage):
 def download_weekday_data(download_click, plots_storage):
     if download_click > 0:
         fig = pio.from_json(orjson.dumps(plots_storage['weekday-plot']))
-        img_bytes = fig.to_image(format="png", scale=10)
+        img_bytes = fig.to_image(format="png", scale=10, width=700)
         img_name = "mywaddle-weekdays.png"
         return dcc.send_bytes(img_bytes, img_name)
     raise PreventUpdate
@@ -381,7 +381,7 @@ def download_weekday_data(download_click, plots_storage):
 def download_calendar_data(download_click, plots_storage):
     if download_click > 0:
         fig = pio.from_json(orjson.dumps(plots_storage['calendar-plot']))
-        img_bytes = fig.to_image(format="png", scale=10)
+        img_bytes = fig.to_image(format="png", scale=10, width=700)
         img_name = "mywaddle-year.png"
         return dcc.send_bytes(img_bytes, img_name)
     raise PreventUpdate
@@ -395,7 +395,7 @@ def download_calendar_data(download_click, plots_storage):
 def download_caller_data(download_click, plots_storage):
     if download_click > 0:
         fig = pio.from_json(orjson.dumps(plots_storage['caller-plot']))
-        img_bytes = fig.to_image(format="png", scale=10)
+        img_bytes = fig.to_image(format="png", scale=10, width=700)
         img_name = "mywaddle-caller.png"
         return dcc.send_bytes(img_bytes, img_name)
     raise PreventUpdate
@@ -409,7 +409,7 @@ def download_caller_data(download_click, plots_storage):
 def download_terminator_data(download_click, plots_storage):
     if download_click > 0:
         fig = pio.from_json(orjson.dumps(plots_storage['terminator-plot']))
-        img_bytes = fig.to_image(format="png", scale=10)
+        img_bytes = fig.to_image(format="png", scale=10, width=700)
         img_name = "mywaddle-callender.png"
         return dcc.send_bytes(img_bytes, img_name)
     raise PreventUpdate
