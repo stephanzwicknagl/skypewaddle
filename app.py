@@ -10,6 +10,7 @@ import plotly.io as pio
 from dash import CeleryManager, Dash, DiskcacheManager, dcc, html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
+from flask_caching import Cache
 
 from backend import create, extract, utils
 from frontend.download import download_content
@@ -37,6 +38,12 @@ app = Dash(__name__,
            background_callback_manager=background_callback_manager)
 
 server = app.server
+cache = Cache(server, config={
+    'CACHE_TYPE': 'reids',
+    'CACHE_REDIS_URL': os.environ.get('REDIS_URL', '')
+    # 'CACHE_TYPE': 'FileSystemCache',
+    # 'CACHE_DIR': 'cache-directory',
+})
 
 app.clientside_callback(
     """
@@ -233,7 +240,7 @@ def render_site_content(uploaded_data, participant_value, participant_confirmed,
               State('upload-data', 'filename'))
 def on_upload(contents, filename):
     if contents is not None:
-        conversations = utils.read_conversations_from_file(contents, filename)
+        conversations = get_conversations(contents, filename)
         participants = extract.extract_conversations(conversations)
         options = [{
             'label': p['label'],
@@ -242,6 +249,9 @@ def on_upload(contents, filename):
         return options, participants
     raise PreventUpdate
 
+@cache.memoize(timeout=300)
+def get_conversations(contents, filename):
+    return utils.read_conversations_from_file(contents, filename)
 
 @app.callback(
     Output("info-modal", "is_open"),
@@ -316,18 +326,12 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
         participant = participant_userid[participant_value]
         if plots_storage is None:
             try:
-                conversations = utils.read_conversations_from_file(upload_contents, upload_filename)
-                df = extract.get_calls(update_progress, conversations, participant_value,
+                conversations = get_conversations(upload_contents, upload_filename)
+                df = get_df(update_progress, conversations, participant_value,
                                     timezone['clientside_timezone'])
             except ValueError:
                 return None, None, True, True, 'Generating plots... 📈'
-            plots ={
-                'duration-plot': create.duration_plot(df),
-                'weekday-plot': create.weekday_plot(df),
-                'calendar-plot': create.calendar_plot(df),
-                'caller-plot': create.caller_plot(df, participant),
-                'terminator-plot': create.terminator_plot(df, participant),
-            }
+            plots = get_plots(df, participant)
         else:
             plots = plots_storage
         tabs = dbc.Tabs(
@@ -343,6 +347,22 @@ def on_participant_select(update_progress, participant_submitted, plots_storage,
         return tabs, plots, False, True, 'Generating plots... 📈'
 
     raise PreventUpdate
+
+@cache.memoize(timeout=300)
+def get_df(update_progress, conversations, participant_value,
+                                    timezone):
+    return extract.get_calls(update_progress, conversations, participant_value,
+                                    timezone)
+
+@cache.memoize(timeout=3600)
+def get_plots(df, participant):
+    return {
+                'duration-plot': create.duration_plot(df),
+                'weekday-plot': create.weekday_plot(df),
+                'calendar-plot': create.calendar_plot(df),
+                'caller-plot': create.caller_plot(df, participant),
+                'terminator-plot': create.terminator_plot(df, participant),
+            }
 
 @app.callback(
     Output('download-duration-plot', 'data'),
