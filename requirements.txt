@@ -52,5 +52,5 @@ typing_extensions==4.5.0
 tzdata==2022.7
 vine==5.0.0
 wcwidth==0.2.6
-Werkzeug==2.2.3
+Werkzeug==2.3.8
 wrapt==1.15.0
